@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
+import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
@@ -64,6 +65,19 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`font-sans antialiased`}>
+        {/* Google tag (gtag.js) - 使用beforeInteractive策略，Next.js会自动放在head中，紧跟在head元素之后 */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-XE3TDNW61V"
+          strategy="beforeInteractive"
+        />
+        <Script id="google-analytics" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XE3TDNW61V');
+          `}
+        </Script>
         {children}
         <Analytics />
       </body>
