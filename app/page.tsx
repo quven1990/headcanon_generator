@@ -298,7 +298,7 @@ export default function HeadcanonGenerator() {
                     {/* Headcanon Generator 插图 */}
                     <Image
                       src="/endless_character_ideas.png"
-                      alt="The headcanon generator - A fantastical illustration showing creative characters and imaginative worlds emerging from an open book"
+                      alt="Headcanon Generator - Creative character ideas and imaginative worlds illustration for AI-powered headcanon creation"
                       fill
                       className="object-cover"
                       priority
@@ -327,7 +327,7 @@ export default function HeadcanonGenerator() {
                     {/* Character Headcanon Generator 界面插图 */}
                     <Image
                       src="/easy_to_use.png"
-                      alt="Easy to use interface - Modern Character Headcanon Generator with intuitive design and creative elements"
+                      alt="Headcanon Generator interface - Easy to use AI headcanon generator tool with intuitive design for creating character ideas"
                       fill
                       className="object-cover"
                       priority
@@ -356,7 +356,7 @@ export default function HeadcanonGenerator() {
                     {/* AI Headkots - Character transformation illustration */}
                     <Image
                       src="/expand_character_depth.png"
-                      alt="Expand character depth - AI-powered character transformation with holographic displays and creative ideas"
+                      alt="Headcanon Generator - Expand character depth with AI-powered headcanon creation and character development tools"
                       fill
                       className="object-cover"
                       priority

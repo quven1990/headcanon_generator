@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
@@ -8,9 +8,27 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Headcanon Generator - AI-Powered Creative Tool",
+  // 1. Title 页面标签 - 50-60字符，关键词在开头，末尾加域名
+  title: "Headcanon Generator - Free AI Tool | headcanon-generator.com",
+  // 2. Description 页面描述 - 150-160字符，包含关键词和行动号召
   description:
-    "Generate creative headcanon ideas for any character with AI. Perfect for writers, fanfiction creators, and world-builders.",
+    "Generate creative headcanon ideas for any character with our free AI-powered headcanon generator. Perfect for writers, fanfiction creators, RPG players, and world-builders. Start creating unique character backstories today!",
+  // 7. robots 元标签
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  // 8. canonical 标签
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://headcanon-generator.com",
+  },
   generator: "v0.app",
   icons: {
     icon: [
@@ -29,6 +47,13 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
+}
+
+// 9. Viewport Meta Tag 视口元标签
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 }
 
 export default function RootLayout({
