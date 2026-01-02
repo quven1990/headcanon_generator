@@ -20,17 +20,30 @@ export async function POST(req: Request) {
     const prompt = `You are a creative writing assistant that generates fictional headcanon ideas for characters. 
 
 Generate a headcanon based on the following:
-- Type: ${headcanonType}
-- Focus: ${focusArea}
+- Type: ${headcanonType || "Random"}
+- Focus: ${focusArea || "Random"}
 - Character/Situation: ${characterInput}
 
-Write a creative, engaging, and story-driven headcanon in 2-4 paragraphs. The headcanon should:
+Write a creative, engaging, and story-driven headcanon in THREE distinct sections, separated by double newlines (\\n\\n):
+
+1. **Brainstorm** (1-2 sentences): A brief, creative idea or concept
+2. **Elaboration** (2-3 sentences): Expand on the brainstorm with more details and context
+3. **Scene** (2-4 sentences): A vivid, specific scene or moment that illustrates the headcanon
+
+The headcanon should:
 - Feel like a fan-created personal interpretation
 - Be written in natural, engaging English
 - Be fictional and imaginative
 - Be safe-for-work and appropriate
 - Avoid referencing real people
 - Include specific details that make it feel authentic and believable
+
+Format your response EXACTLY as follows (use \\n\\n to separate sections):
+Brainstorm: [your brainstorm here]
+
+Elaboration: [your elaboration here]
+
+Scene: [your scene here]
 
 Generate the headcanon now:`
 

@@ -53,12 +53,14 @@ export default function HomePage() {
   const { toast } = useToast()
 
   const handleCardClick = (typeId: string, title: string) => {
-    // TODO: 跳转到生成页面，传递类型参数
-    // router.push(`/generate?type=${typeId}`)
-    toast({
-      title: "Coming Soon",
-      description: `${title} generator page is under development.`,
-    })
+    if (typeId === "character-headcanon") {
+      router.push(`/character-headcanon`)
+    } else {
+      toast({
+        title: "Coming Soon",
+        description: `${title} generator page is under development.`,
+      })
+    }
   }
 
   return (
