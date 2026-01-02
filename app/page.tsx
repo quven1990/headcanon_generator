@@ -55,6 +55,8 @@ export default function HomePage() {
   const handleCardClick = (typeId: string, title: string) => {
     if (typeId === "character-headcanon") {
       router.push(`/character-headcanon`)
+    } else if (typeId === "relationship-headcanon") {
+      router.push(`/relationship-headcanon`)
     } else {
       toast({
         title: "Coming Soon",

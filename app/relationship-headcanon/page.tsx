@@ -8,21 +8,23 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, Target, Rocket, Lightbulb, RefreshCw } from "lucide-react"
+import { Heart, Sparkles, Rocket, Lightbulb, RefreshCw, Plus, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
-const headcanonTypes = [
+const relationshipTypes = [
   "Random Selection",
-  "Single Character Daily Life",
-  "Relationship Interaction",
-  "Backstory Expansion",
-  "Future Scenario",
-  "Alternate Universe (AU)",
-  "Humorous Quirk",
-  "Dark What-If",
+  "Friendship",
+  "Romance",
+  "Rivalry",
+  "Mentor-Student",
+  "Sibling Bond",
+  "Parent-Child",
+  "Colleague",
+  "Enemies to Friends",
+  "Best Friends",
 ]
 
 const tones = [
@@ -32,45 +34,49 @@ const tones = [
   "Dark",
   "Humorous",
   "Angst",
+  "Dramatic",
 ]
 
 const lengths = ["Short", "Medium", "Long"]
 
 const examples = [
   {
-    name: "Iron Man",
-    fandom: "Marvel",
-    type: "Humorous Quirk",
-    tone: "Humorous",
-  },
-  {
-    name: "Naruto",
-    fandom: "Naruto",
-    type: "Backstory Expansion",
+    characters: ["Sherlock Holmes", "John Watson"],
+    fandom: "Sherlock",
+    type: "Best Friends",
     tone: "Wholesome",
   },
   {
-    name: "Batman",
-    fandom: "DC Comics",
-    type: "Dark What-If",
-    tone: "Dark",
+    characters: ["Frodo", "Sam"],
+    fandom: "The Lord of the Rings",
+    type: "Friendship",
+    tone: "Emotional",
+  },
+  {
+    characters: ["Tony Stark", "Steve Rogers"],
+    fandom: "Marvel",
+    type: "Rivalry",
+    tone: "Dramatic",
   },
 ]
 
-export default function CharacterHeadcanonPage() {
+export default function RelationshipHeadcanonPage() {
   const router = useRouter()
   const { toast } = useToast()
 
-  const [characterName, setCharacterName] = useState("")
+  const [characters, setCharacters] = useState<string[]>([""])
   const [fandom, setFandom] = useState("")
-  const [headcanonType, setHeadcanonType] = useState("Random Selection")
+  const [relationshipTypeMode, setRelationshipTypeMode] = useState<"list" | "custom">("list")
+  const [relationshipType, setRelationshipType] = useState("Random Selection")
+  const [customRelationshipType, setCustomRelationshipType] = useState("")
   const [tone, setTone] = useState("Random Selection")
   const [length, setLength] = useState("Medium")
   const [context, setContext] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedHeadcanon, setGeneratedHeadcanon] = useState<{
-    character: string
+    characters: string[]
     fandom: string
+    type: string
     tone: string
     coreIdea: string
     development: string
@@ -78,24 +84,47 @@ export default function CharacterHeadcanonPage() {
   } | null>(null)
   const [isLoadingSection, setIsLoadingSection] = useState<string | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
-  const [totalTime, setTotalTime] = useState<number>(0)
+
+  const handleAddCharacter = () => {
+    if (characters.length < 5) {
+      setCharacters([...characters, ""])
+    } else {
+      toast({
+        title: "Maximum Characters",
+        description: "You can add up to 5 characters.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleRemoveCharacter = (index: number) => {
+    if (characters.length > 1) {
+      setCharacters(characters.filter((_, i) => i !== index))
+    }
+  }
+
+  const handleCharacterChange = (index: number, value: string) => {
+    const newChars = [...characters]
+    newChars[index] = value
+    setCharacters(newChars)
+  }
 
   const handleExampleClick = (example: typeof examples[0]) => {
-    setCharacterName(example.name)
+    setCharacters(example.characters)
     setFandom(example.fandom)
-    setHeadcanonType(example.type)
+    setRelationshipType(example.type)
+    setCustomRelationshipType("")
+    setRelationshipTypeMode("list")
     setTone(example.tone)
     setContext("")
   }
 
   const parseHeadcanon = (text: string) => {
-    // 清理文本
     let cleanText = text.trim()
     
-    // 尝试解析结构化的内容（带标签）- 支持新旧格式
-    const coreIdeaMatch = cleanText.match(/(?:Core Idea|core idea|CoreIdea|Brainstorm|brainstorm):\s*(.+?)(?=\n\n*(?:Development|development|Elaboration|elaboration|Moment|moment|Scene|scene):|$)/is)
-    const developmentMatch = cleanText.match(/(?:Development|development|Elaboration|elaboration):\s*(.+?)(?=\n\n*(?:Moment|moment|Scene|scene):|$)/is)
-    const momentMatch = cleanText.match(/(?:Moment|moment|Scene|scene):\s*(.+?)$/is)
+    const coreIdeaMatch = cleanText.match(/(?:Core Idea|core idea|CoreIdea|Brainstorm|brainstorm):\s*(.+?)(?=\n\n*(?:Development|development|Elaboration|elaboration|Moment|moment|Scene|scene):|$)/i)
+    const developmentMatch = cleanText.match(/(?:Development|development|Elaboration|elaboration):\s*(.+?)(?=\n\n*(?:Moment|moment|Scene|scene):|$)/i)
+    const momentMatch = cleanText.match(/(?:Moment|moment|Scene|scene):\s*(.+?)$/i)
 
     let coreIdea = ""
     let development = ""
@@ -106,7 +135,6 @@ export default function CharacterHeadcanonPage() {
       development = developmentMatch[1].trim().replace(/^["']|["']$/g, "")
       moment = momentMatch[1].trim().replace(/^["']|["']$/g, "")
     } else {
-      // 如果没有找到结构化格式，尝试按段落分割
       const paragraphs = cleanText.split(/\n\n+/).filter(p => p.trim())
       if (paragraphs.length >= 3) {
         coreIdea = paragraphs[0].trim()
@@ -117,14 +145,12 @@ export default function CharacterHeadcanonPage() {
         development = paragraphs[1].trim()
         moment = ""
       } else if (paragraphs.length === 1) {
-        // 如果只有一个段落，尝试按句子分割
         const sentences = paragraphs[0].split(/[.!?]+/).filter(s => s.trim())
         const third = Math.ceil(sentences.length / 3)
         coreIdea = sentences.slice(0, third).join(". ").trim() + (sentences.slice(0, third).length > 0 ? "." : "")
         development = sentences.slice(third, third * 2).join(". ").trim() + (sentences.slice(third, third * 2).length > 0 ? "." : "")
         moment = sentences.slice(third * 2).join(". ").trim() + (sentences.slice(third * 2).length > 0 ? "." : "")
       } else {
-        // 最后的回退：按字符数分割
         coreIdea = cleanText.substring(0, Math.min(150, cleanText.length))
         development = cleanText.substring(150, Math.min(400, cleanText.length))
         moment = cleanText.substring(400)
@@ -139,26 +165,39 @@ export default function CharacterHeadcanonPage() {
   }
 
   const handleGenerate = async () => {
-    if (!characterName.trim()) {
+    const validCharacters = characters.filter(c => c.trim())
+    if (validCharacters.length === 0) {
       toast({
-        title: "Missing Character",
-        description: "Please enter a character name.",
+        title: "Missing Characters",
+        description: "Please enter at least one character name.",
         variant: "destructive",
       })
       return
     }
+
+    const finalRelationshipType = relationshipTypeMode === "custom" 
+      ? customRelationshipType.trim() 
+      : (relationshipType === "Random Selection" ? "" : relationshipType)
+
+    if (relationshipTypeMode === "custom" && !customRelationshipType.trim()) {
+      toast({
+        title: "Missing Relationship Type",
+        description: "Please enter a custom relationship type.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsGenerating(true)
     setGeneratedHeadcanon(null)
     setIsLoadingSection("coreIdea")
 
-    const randomTime = Math.floor(Math.random() * (23 - 18 + 1)) + 18 // 18-23 seconds
-    setTotalTime(randomTime)
+    const randomTime = Math.floor(Math.random() * (23 - 18 + 1)) + 18
     setCountdown(randomTime)
 
     let countdownInterval: NodeJS.Timeout | null = null
     let timeoutId: NodeJS.Timeout | null = null
 
-    // 倒计时效果
     countdownInterval = setInterval(() => {
       setCountdown(prev => {
         if (prev && prev > 1) return prev - 1
@@ -167,7 +206,6 @@ export default function CharacterHeadcanonPage() {
       })
     }, 1000)
 
-    // 40秒超时检测
     timeoutId = setTimeout(() => {
       if (countdownInterval) clearInterval(countdownInterval)
       setCountdown(null)
@@ -178,7 +216,7 @@ export default function CharacterHeadcanonPage() {
         description: "The generation took too long. Please try again.",
         variant: "destructive",
       })
-    }, 40000) // 40 seconds timeout
+    }, 40000)
 
     try {
       const response = await fetch("/api/generate", {
@@ -187,14 +225,13 @@ export default function CharacterHeadcanonPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          headcanonType: headcanonType === "Random Selection" ? "" : headcanonType,
+          headcanonType: finalRelationshipType || "Relationship",
           focusArea: tone === "Random Selection" ? "" : tone,
-          characterInput: `${characterName}${fandom ? ` from ${fandom}` : ""}${context ? `. ${context}` : ""}`,
+          characterInput: `${validCharacters.join(" and ")}${fandom ? ` from ${fandom}` : ""}${context ? `. ${context}` : ""}`,
           length: length,
         }),
       })
 
-      // 清除超时定时器
       if (timeoutId) clearTimeout(timeoutId)
 
       if (!response.ok) {
@@ -202,15 +239,13 @@ export default function CharacterHeadcanonPage() {
       }
 
       const data = await response.json()
-
-      // 解析生成的内容
       const parsed = parseHeadcanon(data.headcanon)
 
-      // 动态加载效果 - 逐步显示内容
       setIsLoadingSection("coreIdea")
       setGeneratedHeadcanon({
-        character: characterName,
-        fandom: fandom || characterName,
+        characters: validCharacters,
+        fandom: fandom || validCharacters.join(" & "),
+        type: finalRelationshipType || "Relationship",
         tone: tone === "Random Selection" ? "Random" : tone,
         coreIdea: parsed.coreIdea,
         development: "",
@@ -236,10 +271,9 @@ export default function CharacterHeadcanonPage() {
       await new Promise(resolve => setTimeout(resolve, 500))
 
       setIsLoadingSection(null)
-      if (countdownInterval) clearInterval(countdownInterval) // Stop countdown on success
+      if (countdownInterval) clearInterval(countdownInterval)
       setCountdown(null)
     } catch (error) {
-      // 清除超时定时器
       if (timeoutId) clearTimeout(timeoutId)
       toast({
         title: "Generation Failed",
@@ -247,13 +281,12 @@ export default function CharacterHeadcanonPage() {
         variant: "destructive",
       })
       setIsLoadingSection(null)
-      if (countdownInterval) clearInterval(countdownInterval) // Stop countdown on error
+      if (countdownInterval) clearInterval(countdownInterval)
       setCountdown(null)
     } finally {
       setIsGenerating(false)
     }
   }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50/40 via-rose-50/30 to-pink-50/40">
@@ -263,62 +296,91 @@ export default function CharacterHeadcanonPage() {
           <div className="mb-4 flex items-center justify-center gap-3">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/60 blur-xl opacity-50 animate-pulse" />
-              <Sparkles className="relative h-10 w-10 text-primary drop-shadow-lg" />
+              <Heart className="relative h-10 w-10 text-primary drop-shadow-lg" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-balance bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent md:text-5xl drop-shadow-sm">
-              Character Headcanon Generator
+              Relationship Headcanon Generator
             </h1>
           </div>
-          <p className="text-lg text-gray-700 text-pretty md:text-xl max-w-3xl mx-auto mb-6">
-            Craft unique character stories by customizing every detail—from personality traits to backstory depth.
+          <p className="text-lg text-gray-700 text-pretty md:text-xl max-w-3xl mx-auto mb-2">
+            Create personalized relationship headcanons by customizing Characters, Fandom, Relationship Type, Tone, Length, and Context.
           </p>
           <p className="text-sm text-gray-600 mb-6">
-            Our intelligent generator adapts to your creative vision, delivering personalized headcanons in seconds.
+            Our AI-powered relationship generator helps you explore character dynamics, friendships, romances, and rivalries.
           </p>
           
           {/* Feature Badges */}
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-200">
+              <Heart className="h-4 w-4 text-pink-600" />
+              <span className="text-sm font-medium text-pink-700">Relationship Focused</span>
+            </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-200">
               <Sparkles className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-700">Smart AI Generation</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200">
-              <Target className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-700">Complete Control</span>
+              <span className="text-sm font-medium text-purple-700">Multi-Character</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200">
               <Rocket className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-green-700">Quick & Easy</span>
+              <span className="text-sm font-medium text-green-700">AI-Powered</span>
             </div>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* LEFT PANEL: Custom Generation Parameters */}
+          {/* LEFT PANEL: Relationship Generation Parameters */}
           <div className="flex-1 max-w-xl space-y-5">
             <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  Custom Generation Parameters
+                  Relationship Generation Parameters
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Configure all aspects of your headcanon generation to create the perfect character story.
+                  Configure all aspects of your relationship headcanon to explore character dynamics and bonds.
                 </p>
               </div>
 
               <div className="space-y-4">
-                {/* Character */}
+                {/* Characters */}
                 <div className="space-y-2">
-                  <Label htmlFor="character" className="text-sm font-medium text-gray-900">
-                    Character <span className="text-red-500">*</span>
+                  <Label htmlFor="characters" className="text-sm font-medium text-gray-900">
+                    Characters <span className="text-red-500">*</span> <span className="text-gray-500 text-xs">(Max 5)</span>
                   </Label>
-                  <Input
-                    id="character"
-                    value={characterName}
-                    onChange={(e) => setCharacterName(e.target.value)}
-                    placeholder="Enter character name (eg: Harry Potter, Elsa, Sp)"
-                    className="h-10 border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg bg-white"
-                  />
+                  <div className="space-y-2">
+                    {characters.map((char, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={char}
+                          onChange={(e) => handleCharacterChange(index, e.target.value)}
+                          placeholder="Enter character name"
+                          className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white"
+                        />
+                        {characters.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRemoveCharacter(index)}
+                            className="h-10 w-10 text-gray-500 hover:text-red-500"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    {characters.length < 5 && (
+                      <div className="pt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleAddCharacter}
+                          className="w-full h-10 border-2 border-dashed border-pink-300 bg-pink-50/50 hover:bg-pink-100/50 hover:border-pink-400 text-pink-600 hover:text-pink-700 rounded-lg transition-all duration-200"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Character ({characters.length}/5)
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Fandom */}
@@ -330,28 +392,70 @@ export default function CharacterHeadcanonPage() {
                     id="fandom"
                     value={fandom}
                     onChange={(e) => setFandom(e.target.value)}
-                    placeholder="Enter fandom name (eg: Naruto, Marvel...)"
-                    className="h-10 border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg bg-white"
+                    placeholder="Enter fandom name (eg: Harry Potter, Marvel...)"
+                    className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white"
                   />
                 </div>
 
-                {/* Type */}
+                {/* Relationship Type */}
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-sm font-medium text-gray-900">
-                    Type
+                  <Label className="text-sm font-medium text-gray-900">
+                    Relationship Type
                   </Label>
-                  <Select value={headcanonType} onValueChange={setHeadcanonType}>
-                    <SelectTrigger id="type" className="h-10 border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {headcanonTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2 mb-2">
+                    <Button
+                      type="button"
+                      variant={relationshipTypeMode === "list" ? "default" : "outline"}
+                      onClick={() => setRelationshipTypeMode("list")}
+                      className={cn(
+                        "h-9 text-xs",
+                        relationshipTypeMode === "list"
+                          ? "bg-pink-500 hover:bg-pink-600 text-white"
+                          : "bg-white"
+                      )}
+                    >
+                      Choose from List
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={relationshipTypeMode === "custom" ? "default" : "outline"}
+                      onClick={() => setRelationshipTypeMode("custom")}
+                      className={cn(
+                        "h-9 text-xs",
+                        relationshipTypeMode === "custom"
+                          ? "bg-pink-500 hover:bg-pink-600 text-white"
+                          : "bg-white"
+                      )}
+                    >
+                      Custom Input
+                    </Button>
+                  </div>
+                  {relationshipTypeMode === "list" ? (
+                    <Select value={relationshipType} onValueChange={setRelationshipType}>
+                      <SelectTrigger className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {relationshipTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="space-y-2">
+                      <Input
+                        value={customRelationshipType}
+                        onChange={(e) => setCustomRelationshipType(e.target.value)}
+                        placeholder="Enter custom relationship type (eg: Rival, Best Friend, Mentor, Sibling, Colleague, etc.)"
+                        className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Examples: Rival, Best Friend, Mentor, Sibling, Colleague, etc.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Tone */}
@@ -360,7 +464,7 @@ export default function CharacterHeadcanonPage() {
                     Tone
                   </Label>
                   <Select value={tone} onValueChange={setTone}>
-                    <SelectTrigger id="tone" className="h-10 border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg bg-white">
+                    <SelectTrigger id="tone" className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -379,7 +483,7 @@ export default function CharacterHeadcanonPage() {
                     Length
                   </Label>
                   <Select value={length} onValueChange={setLength}>
-                    <SelectTrigger id="length" className="h-10 border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg bg-white">
+                    <SelectTrigger id="length" className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -401,26 +505,26 @@ export default function CharacterHeadcanonPage() {
                     id="context"
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
-                    placeholder="Enter additional context or leave empty for auto-generation..."
-                    className="min-h-24 border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg resize-none bg-white"
+                    placeholder="Enter additional context about the relationship, setting, or specific scenario you want to explore (optional)"
+                    className="min-h-24 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg resize-none bg-white"
                   />
                 </div>
 
                 {/* Generate Button */}
                 <Button
                   onClick={handleGenerate}
-                  disabled={!characterName.trim() || isGenerating}
-                  className="w-full h-11 text-base font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg rounded-lg"
+                  disabled={characters.filter(c => c.trim()).length === 0 || isGenerating}
+                  className="w-full h-11 text-base font-semibold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-md hover:shadow-lg rounded-lg"
                 >
                   {isGenerating ? (
                     <>
-                      <Sparkles className="mr-2 h-5 w-5 animate-spin" />
+                      <Heart className="mr-2 h-5 w-5 animate-spin" />
                       {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
                     </>
                   ) : (
                     <>
-                      <Sparkles className="mr-2 h-5 w-5" />
-                      Generate Headcanon
+                      <Heart className="mr-2 h-5 w-5" />
+                      Generate Relationship Headcanon
                     </>
                   )}
                 </Button>
@@ -428,22 +532,20 @@ export default function CharacterHeadcanonPage() {
             </Card>
           </div>
 
-          {/* RIGHT PANEL: Your Generated Headcanon */}
+          {/* RIGHT PANEL: Ready to Generate / Generated Headcanon */}
           <div className="flex-1 lg:max-w-xl space-y-6">
             {isGenerating && !generatedHeadcanon ? (
               <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    Your Generated Headcanon
+                    Your Generated Relationship Headcanon
                   </h2>
                   <p className="text-sm text-gray-600">
-                    AI-generated character story based on your custom parameters.
+                    AI-generated relationship story based on your custom parameters.
                   </p>
                 </div>
 
-                {/* Loading Animation */}
                 <div className="space-y-4">
-                  {/* Character Placeholder */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
                       <div className="h-8 w-32 bg-gray-200 rounded-lg animate-pulse mb-2"></div>
@@ -452,13 +554,8 @@ export default function CharacterHeadcanonPage() {
                         <div className="h-6 w-20 bg-gray-200 rounded-full animate-pulse"></div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse"></div>
-                      <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
                   </div>
 
-                  {/* Core Idea Loading */}
                   <div className="p-4 rounded-lg bg-orange-50 border border-orange-100">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 rounded-full bg-orange-500"></div>
@@ -470,7 +567,6 @@ export default function CharacterHeadcanonPage() {
                     </div>
                   </div>
 
-                  {/* Development Loading */}
                   <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 rounded-full bg-blue-500"></div>
@@ -483,7 +579,6 @@ export default function CharacterHeadcanonPage() {
                     </div>
                   </div>
 
-                  {/* Moment Loading */}
                   <div className="p-4 rounded-lg bg-green-50 border border-green-100">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
@@ -497,10 +592,9 @@ export default function CharacterHeadcanonPage() {
                     </div>
                   </div>
 
-                  {/* Countdown Display */}
                   <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-center justify-center gap-2 text-purple-600">
-                      <Sparkles className="h-5 w-5 animate-spin" />
+                    <div className="flex items-center justify-center gap-2 text-pink-600">
+                      <Heart className="h-5 w-5 animate-spin" />
                       <span className="text-sm font-medium">
                         {countdown !== null ? `Generating in ${countdown}s...` : "Generating..."}
                       </span>
@@ -512,42 +606,40 @@ export default function CharacterHeadcanonPage() {
               <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-6 w-6 text-purple-600" />
+                    <Heart className="h-6 w-6 text-pink-600" />
                     <h2 className="text-xl font-bold text-gray-900">
-                      Ready to Generate Your Custom Headcanon
+                      Ready to Generate Your Relationship Headcanon
                     </h2>
                   </div>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Fill in the parameters on the left and click 'Generate Headcanon' to create your personalized character story. Our AI will craft a unique headcanon based on your specifications.
+                    Fill in the parameters on the left and click "Generate Relationship Headcanon" to create your personalized character relationship story. Our AI will craft a unique headcanon exploring the dynamics between your characters.
                   </p>
                 </div>
 
-                {/* Features List */}
                 <div className="space-y-3 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-pink-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      Explore character relationships, friendships, and romances
+                    </p>
+                  </div>
                   <div className="flex items-start gap-3">
                     <Sparkles className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      Customize character, fandom, type, tone, length, and context
+                      Customize relationship type, tone, length, and context
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Target className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <Rocket className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      Get structured output with core idea, development, and moment
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Rocket className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      Generate images for your headcanon after creation
+                      Generate images for your relationship headcanon after creation
                     </p>
                   </div>
                 </div>
 
-                {/* Popular Examples */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <Lightbulb className="h-4 w-4 text-purple-600" />
+                    <Lightbulb className="h-4 w-4 text-pink-600" />
                     <h3 className="text-base font-semibold text-gray-900">Popular Examples to Try</h3>
                   </div>
                   <div className="space-y-2.5">
@@ -555,10 +647,10 @@ export default function CharacterHeadcanonPage() {
                       <button
                         key={index}
                         onClick={() => handleExampleClick(example)}
-                        className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-200"
+                        className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-pink-300 hover:bg-pink-50 transition-all duration-200"
                       >
                         <p className="font-medium text-sm text-gray-900 mb-1">
-                          {example.name}
+                          {example.characters.join(" & ")}
                         </p>
                         <p className="text-xs text-gray-600">
                           Fandom: {example.fandom} | Type: {example.type} | Tone: {example.tone}
@@ -567,7 +659,7 @@ export default function CharacterHeadcanonPage() {
                     ))}
                   </div>
                   <p className="text-xs text-gray-500 mt-3 text-center">
-                    Click any example to auto-fill the form, or create your own unique character story!
+                    Click any example to auto-fill the form, or create your own unique relationship story!
                   </p>
                 </div>
               </Card>
@@ -575,24 +667,26 @@ export default function CharacterHeadcanonPage() {
               <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    Your Generated Headcanon
+                    Your Generated Relationship Headcanon
                   </h2>
                   <p className="text-sm text-gray-600">
-                    AI-generated character story based on your custom parameters.
+                    AI-generated relationship story based on your custom parameters.
                   </p>
                 </div>
 
-                {/* Character & Tags */}
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      {generatedHeadcanon.character}
+                      {generatedHeadcanon.characters.join(" & ")}
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      <Badge className="px-3 py-1 text-xs bg-purple-100 text-purple-700 border-0">
+                      <Badge className="px-3 py-1 text-xs bg-pink-100 text-pink-700 border-0">
                         {generatedHeadcanon.fandom}
                       </Badge>
                       <Badge className="px-3 py-1 text-xs bg-blue-100 text-blue-700 border-0">
+                        {generatedHeadcanon.type}
+                      </Badge>
+                      <Badge className="px-3 py-1 text-xs bg-purple-100 text-purple-700 border-0">
                         {generatedHeadcanon.tone}
                       </Badge>
                     </div>
@@ -603,9 +697,7 @@ export default function CharacterHeadcanonPage() {
                   </div>
                 </div>
 
-                {/* Story Sections */}
                 <div className="space-y-4 mb-6">
-                  {/* Core Idea - Orange */}
                   <div className={cn(
                     "p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "coreIdea"
@@ -618,7 +710,7 @@ export default function CharacterHeadcanonPage() {
                     </div>
                     {isLoadingSection === "coreIdea" ? (
                       <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Sparkles className="h-4 w-4 animate-spin" />
+                        <Heart className="h-4 w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : (
@@ -628,7 +720,6 @@ export default function CharacterHeadcanonPage() {
                     )}
                   </div>
 
-                  {/* Development - Blue */}
                   <div className={cn(
                     "p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "development"
@@ -643,7 +734,7 @@ export default function CharacterHeadcanonPage() {
                     </div>
                     {isLoadingSection === "development" ? (
                       <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Sparkles className="h-4 w-4 animate-spin" />
+                        <Heart className="h-4 w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : generatedHeadcanon.development ? (
@@ -653,7 +744,6 @@ export default function CharacterHeadcanonPage() {
                     ) : null}
                   </div>
 
-                  {/* Moment - Green */}
                   <div className={cn(
                     "p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "moment"
@@ -668,7 +758,7 @@ export default function CharacterHeadcanonPage() {
                     </div>
                     {isLoadingSection === "moment" ? (
                       <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Sparkles className="h-4 w-4 animate-spin" />
+                        <Heart className="h-4 w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : generatedHeadcanon.moment ? (
@@ -679,12 +769,11 @@ export default function CharacterHeadcanonPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="w-full h-10 text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                    className="w-full h-10 text-sm font-medium bg-pink-600 hover:bg-pink-700 text-white rounded-lg"
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Regenerate

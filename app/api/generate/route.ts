@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   })
 
   try {
-    const { headcanonType, focusArea, characterInput } = await req.json()
+    const { headcanonType, focusArea, characterInput, length } = await req.json()
 
     console.log("\n" + "=".repeat(80))
     console.log(`[${timestamp}] 🚀 收到新的 Headcanon 生成请求`)
@@ -14,21 +14,79 @@ export async function POST(req: Request) {
     console.log("📝 请求参数:")
     console.log(`   - 类型 (Type): ${headcanonType}`)
     console.log(`   - 焦点 (Focus): ${focusArea}`)
+    console.log(`   - 长度 (Length): ${length || "Medium"}`)
     console.log(`   - 角色描述: ${characterInput.substring(0, 100)}${characterInput.length > 100 ? "..." : ""}`)
     console.log("")
 
-    const prompt = `You are a creative writing assistant that generates fictional headcanon ideas for characters. 
+    // 检测是否是关系类型的 headcanon
+    const isRelationshipType = headcanonType.toLowerCase().includes("relationship") || 
+                               headcanonType.toLowerCase().includes("friendship") ||
+                               headcanonType.toLowerCase().includes("romance") ||
+                               headcanonType.toLowerCase().includes("rivalry") ||
+                               headcanonType.toLowerCase().includes("mentor") ||
+                               headcanonType.toLowerCase().includes("sibling") ||
+                               headcanonType.toLowerCase().includes("colleague") ||
+                               headcanonType.toLowerCase().includes("enemy") ||
+                               characterInput.toLowerCase().includes(" and ") ||
+                               characterInput.toLowerCase().includes(" & ")
+
+    // 根据 length 参数确定每个部分的长度要求
+    const lengthGuidance = length === "Short" 
+      ? "Keep each section concise: Core Idea (1 sentence), Development (1-2 sentences), Moment (1-2 sentences). Total should be brief and to the point."
+      : length === "Long"
+      ? "Expand each section in detail: Core Idea (2-3 sentences), Development (3-4 sentences), Moment (3-5 sentences). Provide rich details and depth."
+      : "Use moderate length: Core Idea (1-2 sentences), Development (2-3 sentences), Moment (2-4 sentences). Balance detail with conciseness."
+
+    const prompt = isRelationshipType 
+      ? `You are a creative writing assistant that generates fictional relationship headcanon ideas for characters. 
+
+Generate a relationship headcanon based on the following:
+- Relationship Type: ${headcanonType || "Random"}
+- Tone: ${focusArea || "Random"}
+- Length: ${length || "Medium"}
+- Characters: ${characterInput}
+
+${lengthGuidance}
+
+Focus on the DYNAMICS, INTERACTIONS, and BOND between the characters. Write a creative, engaging, and story-driven relationship headcanon in THREE distinct sections, separated by double newlines (\\n\\n):
+
+1. **Core Idea**: The central concept about the relationship dynamic or bond between the characters
+2. **Development**: Expand on how this relationship developed, their interactions, and what makes their bond unique
+3. **Moment**: A vivid, specific moment or scene that illustrates their relationship in action - show their chemistry, connection, or dynamic
+
+The relationship headcanon should:
+- Focus on the relationship dynamics, not just individual characters
+- Explore how the characters interact, support, challenge, or understand each other
+- Feel like a fan-created personal interpretation of their bond
+- Be written in natural, engaging English
+- Be fictional and imaginative
+- Be safe-for-work and appropriate
+- Avoid referencing real people
+- Include specific details that make the relationship feel authentic and believable
+
+Format your response EXACTLY as follows (use \\n\\n to separate sections):
+Core Idea: [your core idea here]
+
+Development: [your development here]
+
+Moment: [your moment here]
+
+Generate the relationship headcanon now:`
+      : `You are a creative writing assistant that generates fictional headcanon ideas for characters. 
 
 Generate a headcanon based on the following:
 - Type: ${headcanonType || "Random"}
 - Focus: ${focusArea || "Random"}
+- Length: ${length || "Medium"}
 - Character/Situation: ${characterInput}
+
+${lengthGuidance}
 
 Write a creative, engaging, and story-driven headcanon in THREE distinct sections, separated by double newlines (\\n\\n):
 
-1. **Brainstorm** (1-2 sentences): A brief, creative idea or concept
-2. **Elaboration** (2-3 sentences): Expand on the brainstorm with more details and context
-3. **Scene** (2-4 sentences): A vivid, specific scene or moment that illustrates the headcanon
+1. **Core Idea**: The central concept or main idea of the headcanon
+2. **Development**: Expand on the core idea with more details, context, and implications
+3. **Moment**: A vivid, specific moment or scene that illustrates the headcanon in action
 
 The headcanon should:
 - Feel like a fan-created personal interpretation
@@ -39,11 +97,11 @@ The headcanon should:
 - Include specific details that make it feel authentic and believable
 
 Format your response EXACTLY as follows (use \\n\\n to separate sections):
-Brainstorm: [your brainstorm here]
+Core Idea: [your core idea here]
 
-Elaboration: [your elaboration here]
+Development: [your development here]
 
-Scene: [your scene here]
+Moment: [your moment here]
 
 Generate the headcanon now:`
 
