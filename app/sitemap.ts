@@ -8,23 +8,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
   let siteUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`
   siteUrl = siteUrl.replace(/\/$/, '') // 移除末尾的斜杠
   
+  // 获取当前日期作为最后修改时间
+  const now = new Date()
+  
   return [
     {
       url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
       priority: 1.0,
     },
     {
       url: `${siteUrl}/character-headcanon`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
       priority: 0.9,
     },
     {
       url: `${siteUrl}/relationship-headcanon`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
       priority: 0.9,
     },
   ]

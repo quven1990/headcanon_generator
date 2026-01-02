@@ -64,7 +64,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/'],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`.replace(/\/$/, '')}/sitemap.xml`,
   }
 }
 

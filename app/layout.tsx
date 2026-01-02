@@ -26,9 +26,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // 8. canonical 标签
+  // 8. canonical 标签 - 根layout使用默认值，子页面会覆盖
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com",
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com"}/`,
   },
   generator: "v0.app",
   icons: {
