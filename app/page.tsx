@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Headcanon Generator - Free AI Tool | headcanonforge.com",
   // 2. Description 页面描述 - 150-160字符，包含关键词和行动号召
   description:
-    "Generate creative headcanon ideas for any character with our free AI-powered headcanon generator. Perfect for writers, fanfiction creators, RPG players, and world-builders. Start creating unique character backstories today!",
+    "Generate creative headcanon ideas for any character with our free AI-powered headcanon generator. Perfect for writers, fanfiction creators, and RPG players. Start creating unique character backstories today!",
   // 7. robots 元标签
   robots: {
     index: true,

@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Relationship Headcanon Generator AI | headcanonforge.com",
   // 2. Description 页面描述 - 150-160字符，包含关键词和行动号召
   description:
-    "Generate relationship headcanons for characters with our free AI tool. Explore friendships, romances, and rivalries. Perfect for fanfiction and creative writing. Create unique character bonds today!",
+    "Generate relationship headcanons for characters with our free AI tool. Explore friendships, romances, and rivalries. Perfect for fanfiction and creative writing. Create unique bonds today!",
   // 7. robots 元标签
   robots: {
     index: true,
