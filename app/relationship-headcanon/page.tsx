@@ -326,15 +326,15 @@ export default function RelationshipHeadcanonPage() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           {/* LEFT PANEL: Relationship Generation Parameters */}
-          <div className="flex-1 max-w-xl space-y-5">
-            <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="flex-1 w-full lg:max-w-xl space-y-4 md:space-y-5">
+            <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+              <div className="mb-4 md:mb-6">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                   Relationship Generation Parameters
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs md:text-sm text-gray-600">
                   Configure all aspects of your relationship headcanon to explore character dynamics and bonds.
                 </p>
               </div>
@@ -373,10 +373,10 @@ export default function RelationshipHeadcanonPage() {
                           type="button"
                           variant="outline"
                           onClick={handleAddCharacter}
-                          className="w-full h-10 border-2 border-dashed border-pink-300 bg-pink-50/50 hover:bg-pink-100/50 hover:border-pink-400 text-pink-600 hover:text-pink-700 rounded-lg transition-all duration-200"
+                          className="w-full h-10 border-2 border-dashed border-pink-300 bg-pink-50/50 hover:bg-pink-100/50 hover:border-pink-400 text-pink-600 hover:text-pink-700 rounded-lg transition-all duration-200 text-xs md:text-sm"
                         >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Character ({characters.length}/5)
+                          <Plus className="h-3 w-3 md:h-4 md:w-4 mr-2" />
+                          <span className="truncate">Add Character ({characters.length}/5)</span>
                         </Button>
                       </div>
                     )}
@@ -408,26 +408,26 @@ export default function RelationshipHeadcanonPage() {
                       variant={relationshipTypeMode === "list" ? "default" : "outline"}
                       onClick={() => setRelationshipTypeMode("list")}
                       className={cn(
-                        "h-9 text-xs",
+                        "h-9 text-xs flex-1",
                         relationshipTypeMode === "list"
                           ? "bg-pink-500 hover:bg-pink-600 text-white"
                           : "bg-white"
                       )}
                     >
-                      Choose from List
+                      <span className="truncate">Choose from List</span>
                     </Button>
                     <Button
                       type="button"
                       variant={relationshipTypeMode === "custom" ? "default" : "outline"}
                       onClick={() => setRelationshipTypeMode("custom")}
                       className={cn(
-                        "h-9 text-xs",
+                        "h-9 text-xs flex-1",
                         relationshipTypeMode === "custom"
                           ? "bg-pink-500 hover:bg-pink-600 text-white"
                           : "bg-white"
                       )}
                     >
-                      Custom Input
+                      <span className="truncate">Custom Input</span>
                     </Button>
                   </div>
                   {relationshipTypeMode === "list" ? (
@@ -449,9 +449,9 @@ export default function RelationshipHeadcanonPage() {
                         value={customRelationshipType}
                         onChange={(e) => setCustomRelationshipType(e.target.value)}
                         placeholder="Enter custom relationship type (eg: Rival, Best Friend, Mentor, Sibling, Colleague, etc.)"
-                        className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white"
+                        className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white text-sm"
                       />
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 break-words">
                         Examples: Rival, Best Friend, Mentor, Sibling, Colleague, etc.
                       </p>
                     </div>
@@ -514,17 +514,19 @@ export default function RelationshipHeadcanonPage() {
                 <Button
                   onClick={handleGenerate}
                   disabled={characters.filter(c => c.trim()).length === 0 || isGenerating}
-                  className="w-full h-11 text-base font-semibold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-md hover:shadow-lg rounded-lg"
+                  className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-md hover:shadow-lg rounded-lg"
                 >
                   {isGenerating ? (
                     <>
-                      <Heart className="mr-2 h-5 w-5 animate-spin" />
-                      {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
+                      <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                      <span className="truncate">
+                        {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
+                      </span>
                     </>
                   ) : (
                     <>
-                      <Heart className="mr-2 h-5 w-5" />
-                      Generate Relationship Headcanon
+                      <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                      <span className="truncate">Generate Relationship Headcanon</span>
                     </>
                   )}
                 </Button>
@@ -533,10 +535,10 @@ export default function RelationshipHeadcanonPage() {
           </div>
 
           {/* RIGHT PANEL: Ready to Generate / Generated Headcanon */}
-          <div className="flex-1 lg:max-w-xl space-y-6">
+          <div className="flex-1 w-full lg:max-w-xl space-y-4 md:space-y-6">
             {isGenerating && !generatedHeadcanon ? (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-                <div className="mb-6">
+              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="mb-4 md:mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-2">
                     Your Generated Relationship Headcanon
                   </h2>
@@ -594,8 +596,8 @@ export default function RelationshipHeadcanonPage() {
 
                   <div className="pt-4 border-t border-gray-100">
                     <div className="flex items-center justify-center gap-2 text-pink-600">
-                      <Heart className="h-5 w-5 animate-spin" />
-                      <span className="text-sm font-medium">
+                      <Heart className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                      <span className="text-xs md:text-sm font-medium">
                         {countdown !== null ? `Generating in ${countdown}s...` : "Generating..."}
                       </span>
                     </div>
@@ -603,125 +605,155 @@ export default function RelationshipHeadcanonPage() {
                 </div>
               </Card>
             ) : !generatedHeadcanon ? (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-                <div className="mb-6">
+              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="mb-4 md:mb-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Heart className="h-6 w-6 text-pink-600" />
-                    <h2 className="text-xl font-bold text-gray-900">
+                    <Heart className="h-5 w-5 md:h-6 md:w-6 text-pink-600 flex-shrink-0" />
+                    <h2 className="text-lg md:text-xl font-bold text-gray-900">
                       Ready to Generate Your Relationship Headcanon
                     </h2>
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
                     Fill in the parameters on the left and click "Generate Relationship Headcanon" to create your personalized character relationship story. Our AI will craft a unique headcanon exploring the dynamics between your characters.
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-3">
-                    <Heart className="h-5 w-5 text-pink-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                <div className="space-y-2 md:space-y-3 mb-4 md:mb-6">
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <Heart className="h-4 w-4 md:h-5 md:w-5 text-pink-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                       Explore character relationships, friendships, and romances
                     </p>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                       Customize relationship type, tone, length, and context
                     </p>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Rocket className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <Rocket className="h-4 w-4 md:h-5 md:w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                       Generate images for your relationship headcanon after creation
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Lightbulb className="h-4 w-4 text-pink-600" />
-                    <h3 className="text-base font-semibold text-gray-900">Popular Examples to Try</h3>
+                  <div className="flex items-center gap-2 mb-3 md:mb-4">
+                    <Lightbulb className="h-3 w-3 md:h-4 md:w-4 text-pink-600 flex-shrink-0" />
+                    <h3 className="text-sm md:text-base font-semibold text-gray-900">Popular Examples to Try</h3>
                   </div>
-                  <div className="space-y-2.5">
-                    {examples.map((example, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleExampleClick(example)}
-                        className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-pink-300 hover:bg-pink-50 transition-all duration-200"
-                      >
-                        <p className="font-medium text-sm text-gray-900 mb-1">
-                          {example.characters.join(" & ")}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Fandom: {example.fandom} | Type: {example.type} | Tone: {example.tone}
-                        </p>
-                      </button>
-                    ))}
+                  <div className="space-y-2 md:space-y-2.5">
+                    {examples.map((example, index) => {
+                      const isSelected = 
+                        JSON.stringify(characters.sort()) === JSON.stringify(example.characters.sort()) &&
+                        fandom === example.fandom &&
+                        relationshipType === example.type &&
+                        relationshipTypeMode === "list" &&
+                        tone === example.tone
+                      
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => handleExampleClick(example)}
+                          className={cn(
+                            "w-full text-left p-2.5 md:p-3 rounded-lg border transition-all duration-200",
+                            isSelected
+                              ? "border-pink-500 bg-pink-100 shadow-sm"
+                              : "border-gray-200 hover:border-pink-300 hover:bg-pink-50 active:bg-pink-100"
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className={cn(
+                                "font-medium text-xs md:text-sm mb-1 break-words",
+                                isSelected ? "text-pink-900" : "text-gray-900"
+                              )}>
+                                {example.characters.join(" & ")}
+                              </p>
+                              <p className={cn(
+                                "text-xs break-words",
+                                isSelected ? "text-pink-700" : "text-gray-600"
+                              )}>
+                                <span className="hidden sm:inline">Fandom: {example.fandom} | Type: {example.type} | Tone: {example.tone}</span>
+                                <span className="sm:hidden">{example.fandom} · {example.type}</span>
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <div className="flex-shrink-0 mt-0.5">
+                                <div className="w-2 h-2 rounded-full bg-pink-500"></div>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
-                  <p className="text-xs text-gray-500 mt-3 text-center">
+                  <p className="text-xs text-gray-500 mt-2 md:mt-3 text-center">
                     Click any example to auto-fill the form, or create your own unique relationship story!
                   </p>
                 </div>
               </Card>
             ) : (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     Your Generated Relationship Headcanon
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs md:text-sm text-gray-600">
                     AI-generated relationship story based on your custom parameters.
                   </p>
                 </div>
 
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <div className="flex items-start justify-between mb-4 md:mb-6 gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 break-words">
                       {generatedHeadcanon.characters.join(" & ")}
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      <Badge className="px-3 py-1 text-xs bg-pink-100 text-pink-700 border-0">
+                      <Badge className="px-2 md:px-3 py-1 text-xs bg-pink-100 text-pink-700 border-0">
                         {generatedHeadcanon.fandom}
                       </Badge>
-                      <Badge className="px-3 py-1 text-xs bg-blue-100 text-blue-700 border-0">
+                      <Badge className="px-2 md:px-3 py-1 text-xs bg-blue-100 text-blue-700 border-0">
                         {generatedHeadcanon.type}
                       </Badge>
-                      <Badge className="px-3 py-1 text-xs bg-purple-100 text-purple-700 border-0">
+                      <Badge className="px-2 md:px-3 py-1 text-xs bg-purple-100 text-purple-700 border-0">
                         {generatedHeadcanon.tone}
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
-                    <span>Just now</span>
+                  <div className="flex items-center gap-1 md:gap-2 text-xs text-gray-500 flex-shrink-0">
+                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                    <span className="hidden sm:inline">Just now</span>
                   </div>
                 </div>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                   <div className={cn(
-                    "p-4 rounded-lg border transition-all duration-500",
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "coreIdea"
                       ? "bg-orange-50 border-orange-200 animate-pulse"
                       : "bg-orange-50 border-orange-100"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                      <h4 className="text-sm font-semibold text-orange-900">Core Idea</h4>
+                      <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-orange-900">Core Idea</h4>
                     </div>
                     {isLoadingSection === "coreIdea" ? (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Heart className="h-4 w-4 animate-spin" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <Heart className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
                         {generatedHeadcanon.coreIdea}
                       </p>
                     )}
                   </div>
 
                   <div className={cn(
-                    "p-4 rounded-lg border transition-all duration-500",
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "development"
                       ? "bg-blue-50 border-blue-200 animate-pulse"
                       : generatedHeadcanon.development
@@ -729,23 +761,23 @@ export default function RelationshipHeadcanonPage() {
                       : "bg-gray-50 border-gray-100 opacity-50"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <h4 className="text-sm font-semibold text-blue-900">Development</h4>
+                      <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-blue-900">Development</h4>
                     </div>
                     {isLoadingSection === "development" ? (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Heart className="h-4 w-4 animate-spin" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <Heart className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : generatedHeadcanon.development ? (
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
                         {generatedHeadcanon.development}
                       </p>
                     ) : null}
                   </div>
 
                   <div className={cn(
-                    "p-4 rounded-lg border transition-all duration-500",
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "moment"
                       ? "bg-green-50 border-green-200 animate-pulse"
                       : generatedHeadcanon.moment
@@ -753,29 +785,29 @@ export default function RelationshipHeadcanonPage() {
                       : "bg-gray-50 border-gray-100 opacity-50"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      <h4 className="text-sm font-semibold text-green-900">Moment</h4>
+                      <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-green-900">Moment</h4>
                     </div>
                     {isLoadingSection === "moment" ? (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Heart className="h-4 w-4 animate-spin" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <Heart className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : generatedHeadcanon.moment ? (
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
                         {generatedHeadcanon.moment}
                       </p>
                     ) : null}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+                <div className="flex flex-wrap gap-3 pt-3 md:pt-4 border-t border-gray-100">
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="w-full h-10 text-sm font-medium bg-pink-600 hover:bg-pink-700 text-white rounded-lg"
+                    className="w-full h-10 md:h-11 text-xs md:text-sm font-medium bg-pink-600 hover:bg-pink-700 text-white rounded-lg"
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
                     Regenerate
                   </Button>
                 </div>

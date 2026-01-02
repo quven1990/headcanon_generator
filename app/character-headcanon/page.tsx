@@ -293,15 +293,15 @@ export default function CharacterHeadcanonPage() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           {/* LEFT PANEL: Custom Generation Parameters */}
-          <div className="flex-1 max-w-xl space-y-5">
-            <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="flex-1 w-full lg:max-w-xl space-y-4 md:space-y-5">
+            <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+              <div className="mb-4 md:mb-6">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                   Custom Generation Parameters
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs md:text-sm text-gray-600">
                   Configure all aspects of your headcanon generation to create the perfect character story.
                 </p>
               </div>
@@ -410,17 +410,19 @@ export default function CharacterHeadcanonPage() {
                 <Button
                   onClick={handleGenerate}
                   disabled={!characterName.trim() || isGenerating}
-                  className="w-full h-11 text-base font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg rounded-lg"
+                  className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg rounded-lg"
                 >
                   {isGenerating ? (
                     <>
-                      <Sparkles className="mr-2 h-5 w-5 animate-spin" />
-                      {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
+                      <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                      <span className="truncate">
+                        {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
+                      </span>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="mr-2 h-5 w-5" />
-                      Generate Headcanon
+                      <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                      <span className="truncate">Generate Headcanon</span>
                     </>
                   )}
                 </Button>
@@ -429,14 +431,14 @@ export default function CharacterHeadcanonPage() {
           </div>
 
           {/* RIGHT PANEL: Your Generated Headcanon */}
-          <div className="flex-1 lg:max-w-xl space-y-6">
+          <div className="flex-1 w-full lg:max-w-xl space-y-4 md:space-y-6">
             {isGenerating && !generatedHeadcanon ? (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     Your Generated Headcanon
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs md:text-sm text-gray-600">
                     AI-generated character story based on your custom parameters.
                   </p>
                 </div>
@@ -500,8 +502,8 @@ export default function CharacterHeadcanonPage() {
                   {/* Countdown Display */}
                   <div className="pt-4 border-t border-gray-100">
                     <div className="flex items-center justify-center gap-2 text-purple-600">
-                      <Sparkles className="h-5 w-5 animate-spin" />
-                      <span className="text-sm font-medium">
+                      <Sparkles className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                      <span className="text-xs md:text-sm font-medium">
                         {countdown !== null ? `Generating in ${countdown}s...` : "Generating..."}
                       </span>
                     </div>
@@ -509,36 +511,36 @@ export default function CharacterHeadcanonPage() {
                 </div>
               </Card>
             ) : !generatedHeadcanon ? (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-                <div className="mb-6">
+              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="mb-4 md:mb-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-6 w-6 text-purple-600" />
-                    <h2 className="text-xl font-bold text-gray-900">
+                    <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-purple-600 flex-shrink-0" />
+                    <h2 className="text-lg md:text-xl font-bold text-gray-900">
                       Ready to Generate Your Custom Headcanon
                     </h2>
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
                     Fill in the parameters on the left and click 'Generate Headcanon' to create your personalized character story. Our AI will craft a unique headcanon based on your specifications.
                   </p>
                 </div>
 
                 {/* Features List */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                <div className="space-y-2 md:space-y-3 mb-4 md:mb-6">
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                       Customize character, fandom, type, tone, length, and context
                     </p>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Target className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <Target className="h-4 w-4 md:h-5 md:w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                       Get structured output with core idea, development, and moment
                     </p>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Rocket className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <Rocket className="h-4 w-4 md:h-5 md:w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                       Generate images for your headcanon after creation
                     </p>
                   </div>
@@ -546,83 +548,112 @@ export default function CharacterHeadcanonPage() {
 
                 {/* Popular Examples */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Lightbulb className="h-4 w-4 text-purple-600" />
-                    <h3 className="text-base font-semibold text-gray-900">Popular Examples to Try</h3>
+                  <div className="flex items-center gap-2 mb-3 md:mb-4">
+                    <Lightbulb className="h-3 w-3 md:h-4 md:w-4 text-purple-600 flex-shrink-0" />
+                    <h3 className="text-sm md:text-base font-semibold text-gray-900">Popular Examples to Try</h3>
                   </div>
-                  <div className="space-y-2.5">
-                    {examples.map((example, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleExampleClick(example)}
-                        className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-200"
-                      >
-                        <p className="font-medium text-sm text-gray-900 mb-1">
-                          {example.name}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Fandom: {example.fandom} | Type: {example.type} | Tone: {example.tone}
-                        </p>
-                      </button>
-                    ))}
+                  <div className="space-y-2 md:space-y-2.5">
+                    {examples.map((example, index) => {
+                      const isSelected = 
+                        characterName === example.name &&
+                        fandom === example.fandom &&
+                        headcanonType === example.type &&
+                        tone === example.tone
+                      
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => handleExampleClick(example)}
+                          className={cn(
+                            "w-full text-left p-2.5 md:p-3 rounded-lg border transition-all duration-200",
+                            isSelected
+                              ? "border-purple-500 bg-purple-100 shadow-sm"
+                              : "border-gray-200 hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100"
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className={cn(
+                                "font-medium text-xs md:text-sm mb-1",
+                                isSelected ? "text-purple-900" : "text-gray-900"
+                              )}>
+                                {example.name}
+                              </p>
+                              <p className={cn(
+                                "text-xs break-words",
+                                isSelected ? "text-purple-700" : "text-gray-600"
+                              )}>
+                                <span className="hidden sm:inline">Fandom: {example.fandom} | Type: {example.type} | Tone: {example.tone}</span>
+                                <span className="sm:hidden">{example.fandom} · {example.type}</span>
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <div className="flex-shrink-0 mt-0.5">
+                                <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
-                  <p className="text-xs text-gray-500 mt-3 text-center">
+                  <p className="text-xs text-gray-500 mt-2 md:mt-3 text-center">
                     Click any example to auto-fill the form, or create your own unique character story!
                   </p>
                 </div>
               </Card>
             ) : (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     Your Generated Headcanon
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs md:text-sm text-gray-600">
                     AI-generated character story based on your custom parameters.
                   </p>
                 </div>
 
                 {/* Character & Tags */}
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <div className="flex items-start justify-between mb-4 md:mb-6 gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 break-words">
                       {generatedHeadcanon.character}
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      <Badge className="px-3 py-1 text-xs bg-purple-100 text-purple-700 border-0">
+                      <Badge className="px-2 md:px-3 py-1 text-xs bg-purple-100 text-purple-700 border-0">
                         {generatedHeadcanon.fandom}
                       </Badge>
-                      <Badge className="px-3 py-1 text-xs bg-blue-100 text-blue-700 border-0">
+                      <Badge className="px-2 md:px-3 py-1 text-xs bg-blue-100 text-blue-700 border-0">
                         {generatedHeadcanon.tone}
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
-                    <span>Just now</span>
+                  <div className="flex items-center gap-1 md:gap-2 text-xs text-gray-500 flex-shrink-0">
+                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                    <span className="hidden sm:inline">Just now</span>
                   </div>
                 </div>
 
                 {/* Story Sections */}
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                   {/* Core Idea - Orange */}
                   <div className={cn(
-                    "p-4 rounded-lg border transition-all duration-500",
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "coreIdea"
                       ? "bg-orange-50 border-orange-200 animate-pulse"
                       : "bg-orange-50 border-orange-100"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                      <h4 className="text-sm font-semibold text-orange-900">Core Idea</h4>
+                      <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-orange-900">Core Idea</h4>
                     </div>
                     {isLoadingSection === "coreIdea" ? (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Sparkles className="h-4 w-4 animate-spin" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
                         {generatedHeadcanon.coreIdea}
                       </p>
                     )}
@@ -630,7 +661,7 @@ export default function CharacterHeadcanonPage() {
 
                   {/* Development - Blue */}
                   <div className={cn(
-                    "p-4 rounded-lg border transition-all duration-500",
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "development"
                       ? "bg-blue-50 border-blue-200 animate-pulse"
                       : generatedHeadcanon.development
@@ -638,16 +669,16 @@ export default function CharacterHeadcanonPage() {
                       : "bg-gray-50 border-gray-100 opacity-50"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <h4 className="text-sm font-semibold text-blue-900">Development</h4>
+                      <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-blue-900">Development</h4>
                     </div>
                     {isLoadingSection === "development" ? (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Sparkles className="h-4 w-4 animate-spin" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : generatedHeadcanon.development ? (
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
                         {generatedHeadcanon.development}
                       </p>
                     ) : null}
@@ -655,7 +686,7 @@ export default function CharacterHeadcanonPage() {
 
                   {/* Moment - Green */}
                   <div className={cn(
-                    "p-4 rounded-lg border transition-all duration-500",
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "moment"
                       ? "bg-green-50 border-green-200 animate-pulse"
                       : generatedHeadcanon.moment
@@ -663,16 +694,16 @@ export default function CharacterHeadcanonPage() {
                       : "bg-gray-50 border-gray-100 opacity-50"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      <h4 className="text-sm font-semibold text-green-900">Moment</h4>
+                      <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-green-900">Moment</h4>
                     </div>
                     {isLoadingSection === "moment" ? (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Sparkles className="h-4 w-4 animate-spin" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                         <span>Generating...</span>
                       </div>
                     ) : generatedHeadcanon.moment ? (
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
                         {generatedHeadcanon.moment}
                       </p>
                     ) : null}
@@ -680,13 +711,13 @@ export default function CharacterHeadcanonPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+                <div className="flex flex-wrap gap-3 pt-3 md:pt-4 border-t border-gray-100">
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="w-full h-10 text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                    className="w-full h-10 md:h-11 text-xs md:text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
                     Regenerate
                   </Button>
                 </div>
