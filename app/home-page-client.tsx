@@ -67,7 +67,7 @@ export default function HomePageClient() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50/40 via-rose-50/30 to-pink-50/40">
-      <div className="mx-auto max-w-7xl px-4 py-8 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* Header */}
         <header className="mb-12 text-center">
           <div className="mb-4 flex items-center justify-center gap-3">

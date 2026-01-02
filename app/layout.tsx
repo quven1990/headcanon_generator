@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { Navbar } from "@/components/navbar"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -78,6 +79,7 @@ export default function RootLayout({
             gtag('config', 'G-XE3TDNW61V');
           `}
         </Script>
+        <Navbar />
         {children}
         <Analytics />
       </body>

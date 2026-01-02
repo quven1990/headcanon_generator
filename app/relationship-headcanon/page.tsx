@@ -290,7 +290,7 @@ export default function RelationshipHeadcanonPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50/40 via-rose-50/30 to-pink-50/40">
-      <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">
+      <div className="mx-auto max-w-7xl px-4 pt-20 pb-6 md:pt-24 md:pb-8">
         {/* Hero Section */}
         <div className="mb-8 md:mb-12 text-center">
           <div className="mb-4 flex items-center justify-center gap-3">
