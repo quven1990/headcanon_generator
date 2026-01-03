@@ -1,4 +1,7 @@
-export async function POST(req: Request) {
+import { createClient } from "@/lib/supabase/server"
+import { NextRequest, NextResponse } from "next/server"
+
+export async function POST(req: NextRequest) {
   const startTime = Date.now()
   const timestamp = new Date().toLocaleString("zh-CN", { 
     timeZone: "Asia/Shanghai",
@@ -6,7 +9,23 @@ export async function POST(req: Request) {
   })
 
   try {
-    const { headcanonType, focusArea, characterInput, length } = await req.json()
+    // 检查用户是否已登录（服务器端验证）
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.log(`[${timestamp}] ❌ 未授权访问 - 用户未登录`)
+      return NextResponse.json(
+        { error: "Authentication required. Please sign in to generate headcanons." },
+        { status: 401 }
+      )
+    }
+
+    console.log(`[${timestamp}] ✅ 用户已登录: ${user.email}`)
+
+    // 读取请求体（需要在验证之后）
+    const body = await req.json()
+    const { headcanonType, focusArea, characterInput, length } = body
 
     console.log("\n" + "=".repeat(80))
     console.log(`[${timestamp}] 🚀 收到新的 Headcanon 生成请求`)

@@ -4,6 +4,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Sparkles, Heart, Home } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { GoogleLoginButton } from "@/components/google-login-button"
+import { Toaster } from "@/components/ui/toaster"
 
 const navigation = [
   {
@@ -71,6 +73,9 @@ export function Navbar() {
                 </Link>
               )
             })}
+            <div className="ml-4 pl-4 border-l border-gray-200">
+              <GoogleLoginButton />
+            </div>
           </div>
 
           {/* Mobile Navigation */}
@@ -97,6 +102,9 @@ export function Navbar() {
                 </Link>
               )
             })}
+            <div className="ml-2 pl-2 border-l border-gray-200">
+              <GoogleLoginButton />
+            </div>
           </div>
         </div>
       </div>

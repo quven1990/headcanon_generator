@@ -8,10 +8,18 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, Target, Rocket, Lightbulb, RefreshCw } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Sparkles, Target, Rocket, Lightbulb, RefreshCw, LogIn, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/use-auth"
 import { Toaster } from "@/components/ui/toaster"
 
 const headcanonTypes = [
@@ -60,6 +68,7 @@ const examples = [
 export default function CharacterHeadcanonPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { user, loading: authLoading, isAuthenticated } = useAuth()
 
   const [characterName, setCharacterName] = useState("")
   const [fandom, setFandom] = useState("")
@@ -139,6 +148,16 @@ export default function CharacterHeadcanonPage() {
   }
 
   const handleGenerate = async () => {
+    // 检查用户是否已登录
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please sign in with Google to generate headcanons.",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (!characterName.trim()) {
       toast({
         title: "Missing Character",
@@ -307,6 +326,29 @@ export default function CharacterHeadcanonPage() {
               </div>
 
               <div className="space-y-4">
+                {/* Login Required Alert */}
+                {!isAuthenticated && !authLoading && (
+                  <Alert className="border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50">
+                    <LogIn className="h-5 w-5 text-cyan-600" />
+                    <AlertDescription className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-cyan-900 mb-1">Sign in required</p>
+                        <p className="text-sm text-cyan-700">
+                          Please sign in with Google to generate headcanons and unlock all features.
+                        </p>
+                      </div>
+                      <Button
+                        onClick={() => window.location.href = "/api/auth/login"}
+                        size="sm"
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white whitespace-nowrap"
+                      >
+                        <LogIn className="h-4 w-4 mr-2" />
+                        Sign In
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 {/* Character */}
                 <div className="space-y-2">
                   <Label htmlFor="character" className="text-sm font-medium text-gray-900">
@@ -407,25 +449,46 @@ export default function CharacterHeadcanonPage() {
                 </div>
 
                 {/* Generate Button */}
-                <Button
-                  onClick={handleGenerate}
-                  disabled={!characterName.trim() || isGenerating}
-                  className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg rounded-lg"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
-                      <span className="truncate">
-                        {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                      <span className="truncate">Generate Headcanon</span>
-                    </>
-                  )}
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="w-full">
+                        <Button
+                          onClick={handleGenerate}
+                          disabled={!characterName.trim() || isGenerating || !isAuthenticated || authLoading}
+                          className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-md hover:shadow-lg rounded-lg relative"
+                        >
+                          {!isAuthenticated && !authLoading && (
+                            <Lock className="absolute left-3 h-4 w-4" />
+                          )}
+                          {isGenerating ? (
+                            <>
+                              <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                              <span className="truncate">
+                                {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
+                              </span>
+                            </>
+                          ) : !isAuthenticated ? (
+                            <>
+                              <Sparkles className={`mr-2 h-4 w-4 md:h-5 md:w-5 ${!isAuthenticated ? 'opacity-0' : ''}`} />
+                              <span className="truncate">Sign in to Generate</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                              <span className="truncate">Generate Headcanon</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    {!isAuthenticated && !authLoading && (
+                      <TooltipContent>
+                        <p>Please sign in to generate headcanons</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </Card>
           </div>

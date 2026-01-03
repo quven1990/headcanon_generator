@@ -8,10 +8,18 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Heart, Sparkles, Rocket, Lightbulb, RefreshCw, Plus, X } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Heart, Sparkles, Rocket, Lightbulb, RefreshCw, Plus, X, LogIn, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/use-auth"
 import { Toaster } from "@/components/ui/toaster"
 
 const relationshipTypes = [
@@ -63,6 +71,7 @@ const examples = [
 export default function RelationshipHeadcanonPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { isAuthenticated, loading: authLoading } = useAuth()
 
   const [characters, setCharacters] = useState<string[]>([""])
   const [fandom, setFandom] = useState("")
@@ -165,6 +174,16 @@ export default function RelationshipHeadcanonPage() {
   }
 
   const handleGenerate = async () => {
+    // 检查用户是否已登录
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please sign in with Google to generate headcanons.",
+        variant: "destructive",
+      })
+      return
+    }
+
     const validCharacters = characters.filter(c => c.trim())
     if (validCharacters.length === 0) {
       toast({
@@ -340,6 +359,29 @@ export default function RelationshipHeadcanonPage() {
               </div>
 
               <div className="space-y-4">
+                {/* Login Required Alert */}
+                {!isAuthenticated && !authLoading && (
+                  <Alert className="border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50">
+                    <LogIn className="h-5 w-5 text-cyan-600" />
+                    <AlertDescription className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-cyan-900 mb-1">Sign in required</p>
+                        <p className="text-sm text-cyan-700">
+                          Please sign in with Google to generate headcanons and unlock all features.
+                        </p>
+                      </div>
+                      <Button
+                        onClick={() => window.location.href = "/api/auth/login"}
+                        size="sm"
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white whitespace-nowrap"
+                      >
+                        <LogIn className="h-4 w-4 mr-2" />
+                        Sign In
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 {/* Characters */}
                 <div className="space-y-2">
                   <Label htmlFor="characters" className="text-sm font-medium text-gray-900">
@@ -511,25 +553,46 @@ export default function RelationshipHeadcanonPage() {
                 </div>
 
                 {/* Generate Button */}
-                <Button
-                  onClick={handleGenerate}
-                  disabled={characters.filter(c => c.trim()).length === 0 || isGenerating}
-                  className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-md hover:shadow-lg rounded-lg"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
-                      <span className="truncate">
-                        {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                      <span className="truncate">Generate Relationship Headcanon</span>
-                    </>
-                  )}
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="w-full">
+                        <Button
+                          onClick={handleGenerate}
+                          disabled={characters.filter(c => c.trim()).length === 0 || isGenerating || !isAuthenticated || authLoading}
+                          className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-md hover:shadow-lg rounded-lg relative"
+                        >
+                          {!isAuthenticated && !authLoading && (
+                            <Lock className="absolute left-3 h-4 w-4" />
+                          )}
+                          {isGenerating ? (
+                            <>
+                              <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                              <span className="truncate">
+                                {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
+                              </span>
+                            </>
+                          ) : !isAuthenticated ? (
+                            <>
+                              <Heart className={`mr-2 h-4 w-4 md:h-5 md:w-5 ${!isAuthenticated ? 'opacity-0' : ''}`} />
+                              <span className="truncate">Sign in to Generate</span>
+                            </>
+                          ) : (
+                            <>
+                              <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                              <span className="truncate">Generate Relationship Headcanon</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    {!isAuthenticated && !authLoading && (
+                      <TooltipContent>
+                        <p>Please sign in to generate headcanons</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </Card>
           </div>
