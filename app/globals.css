@@ -29,7 +29,7 @@
   --chart-3: oklch(0.7 0.15 320);
   --chart-4: oklch(0.75 0.12 200);
   --chart-5: oklch(0.68 0.16 260);
-  --radius: 0.75rem;
+  --radius: 1rem;
   --sidebar: oklch(0.98 0.005 280);
   --sidebar-foreground: oklch(0.15 0.02 280);
   --sidebar-primary: oklch(0.55 0.22 280);
@@ -123,17 +123,21 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: 
-      radial-gradient(at 0% 0%, oklch(0.97 0.03 280 / 0.1) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, oklch(0.97 0.03 280 / 0.1) 0px, transparent 50%);
+    /* 柔和有活力的背景 */
+    background: 
+      radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.03) 0px, transparent 50%),
+      #fafbfc;
     background-attachment: fixed;
   }
   
   .dark body {
-    /* 明亮柔和的统一背景 - 使用淡淡的粉色调 */
+    /* 柔和有活力的背景（保持一致） */
     background: 
-      radial-gradient(circle at 20% 30%, oklch(0.985 0.02 350 / 0.1) 0px, transparent 50%),
-      radial-gradient(circle at 80% 70%, oklch(0.985 0.02 350 / 0.1) 0px, transparent 50%),
-      oklch(0.99 0.01 350);
+      radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.03) 0px, transparent 50%),
+      #fafbfc;
   }
 }

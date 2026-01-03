@@ -308,74 +308,72 @@ export default function RelationshipHeadcanonPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50/40 via-rose-50/30 to-pink-50/40">
-      <div className="mx-auto max-w-7xl px-4 pt-20 pb-6 md:pt-24 md:pb-8">
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-24 md:pb-16">
         {/* Hero Section */}
-        <div className="mb-8 md:mb-12 text-center">
-          <div className="mb-4 flex items-center justify-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/60 blur-xl opacity-50 animate-pulse" />
-              <Heart className="relative h-10 w-10 text-primary drop-shadow-lg" />
+        <div className="mb-12 text-center">
+          <div className="mb-6 flex items-center justify-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 shadow-sm">
+              <Heart className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-balance bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent md:text-5xl drop-shadow-sm">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent md:text-5xl">
               Relationship Headcanon Generator
             </h1>
           </div>
-          <p className="text-lg text-gray-700 text-pretty md:text-xl max-w-3xl mx-auto mb-2">
-            Create personalized relationship headcanons by customizing Characters, Fandom, Relationship Type, Tone, Length, and Context.
+          <p className="text-lg text-gray-600 text-pretty md:text-xl max-w-2xl mx-auto mb-4">
+            Create personalized relationship headcanons by customizing characters, fandom, relationship type, tone, length, and context.
           </p>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-500 mb-8">
             Our AI-powered relationship generator helps you explore character dynamics, friendships, romances, and rivalries.
           </p>
           
           {/* Feature Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-200">
-              <Heart className="h-4 w-4 text-pink-600" />
-              <span className="text-sm font-medium text-pink-700">Relationship Focused</span>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-pink-50 border border-pink-200">
+              <Heart className="h-3.5 w-3.5 text-pink-600" />
+              <span className="text-xs font-medium text-pink-700">Relationships</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-200">
-              <Sparkles className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-700">Multi-Character</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200">
+              <Sparkles className="h-3.5 w-3.5 text-rose-600" />
+              <span className="text-xs font-medium text-rose-700">Multi-Character</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200">
-              <Rocket className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-green-700">AI-Powered</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
+              <Rocket className="h-3.5 w-3.5 text-purple-600" />
+              <span className="text-xs font-medium text-purple-700">AI-Powered</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* LEFT PANEL: Relationship Generation Parameters */}
-          <div className="flex-1 w-full lg:max-w-xl space-y-4 md:space-y-5">
-            <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
-              <div className="mb-4 md:mb-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
-                  Relationship Generation Parameters
+          <div className="flex-1 w-full lg:max-w-xl space-y-5">
+            <Card className="border border-pink-100 bg-white shadow-sm rounded-2xl p-6">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                  Generation Parameters
                 </h2>
-                <p className="text-xs md:text-sm text-gray-600">
-                  Configure all aspects of your relationship headcanon to explore character dynamics and bonds.
+                <p className="text-sm text-gray-600">
+                  Configure your relationship headcanon settings.
                 </p>
               </div>
 
               <div className="space-y-4">
                 {/* Login Required Alert */}
                 {!isAuthenticated && !authLoading && (
-                  <Alert className="border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50">
-                    <LogIn className="h-5 w-5 text-cyan-600" />
+                  <Alert className="border border-pink-200 bg-pink-50 rounded-xl">
+                    <LogIn className="h-4 w-4 text-pink-600" />
                     <AlertDescription className="flex items-center justify-between gap-4">
                       <div>
-                        <p className="font-semibold text-cyan-900 mb-1">Sign in required</p>
-                        <p className="text-sm text-cyan-700">
-                          Please sign in with Google to generate headcanons and unlock all features.
+                        <p className="font-medium text-pink-900 mb-1 text-sm">Sign in required</p>
+                        <p className="text-xs text-pink-700">
+                          Sign in to generate headcanons.
                         </p>
                       </div>
                       <Button
                         onClick={() => window.location.href = "/api/auth/login"}
                         size="sm"
-                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white whitespace-nowrap"
+                        className="bg-pink-500 hover:bg-pink-600 text-white whitespace-nowrap text-xs h-8 px-3 rounded-lg"
                       >
-                        <LogIn className="h-4 w-4 mr-2" />
                         Sign In
                       </Button>
                     </AlertDescription>
@@ -394,7 +392,7 @@ export default function RelationshipHeadcanonPage() {
                           value={char}
                           onChange={(e) => handleCharacterChange(index, e.target.value)}
                           placeholder="Enter character name"
-                          className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white"
+                          className="h-10 border border-gray-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-xl bg-white transition-all"
                         />
                         {characters.length > 1 && (
                           <Button
@@ -415,7 +413,7 @@ export default function RelationshipHeadcanonPage() {
                           type="button"
                           variant="outline"
                           onClick={handleAddCharacter}
-                          className="w-full h-10 border-2 border-dashed border-pink-300 bg-pink-50/50 hover:bg-pink-100/50 hover:border-pink-400 text-pink-600 hover:text-pink-700 rounded-lg transition-all duration-200 text-xs md:text-sm"
+                          className="w-full h-10 border-2 border-dashed border-pink-400 bg-pink-50/80 hover:bg-pink-100/80 hover:border-pink-500 text-pink-600 hover:text-pink-700 rounded-lg transition-all duration-200 text-xs md:text-sm font-medium"
                         >
                           <Plus className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                           <span className="truncate">Add Character ({characters.length}/5)</span>
@@ -435,7 +433,7 @@ export default function RelationshipHeadcanonPage() {
                     value={fandom}
                     onChange={(e) => setFandom(e.target.value)}
                     placeholder="Enter fandom name (eg: Harry Potter, Marvel...)"
-                    className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white"
+                    className="h-10 border border-gray-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-xl bg-white transition-all"
                   />
                 </div>
 
@@ -450,10 +448,10 @@ export default function RelationshipHeadcanonPage() {
                       variant={relationshipTypeMode === "list" ? "default" : "outline"}
                       onClick={() => setRelationshipTypeMode("list")}
                       className={cn(
-                        "h-9 text-xs flex-1",
+                        "h-9 text-xs flex-1 font-medium",
                         relationshipTypeMode === "list"
-                          ? "bg-pink-500 hover:bg-pink-600 text-white"
-                          : "bg-white"
+                          ? "bg-pink-500 hover:bg-pink-600 text-white shadow-md"
+                          : "bg-white border-gray-300 hover:bg-pink-50/50"
                       )}
                     >
                       <span className="truncate">Choose from List</span>
@@ -463,10 +461,10 @@ export default function RelationshipHeadcanonPage() {
                       variant={relationshipTypeMode === "custom" ? "default" : "outline"}
                       onClick={() => setRelationshipTypeMode("custom")}
                       className={cn(
-                        "h-9 text-xs flex-1",
+                        "h-9 text-xs flex-1 font-medium",
                         relationshipTypeMode === "custom"
-                          ? "bg-pink-500 hover:bg-pink-600 text-white"
-                          : "bg-white"
+                          ? "bg-pink-500 hover:bg-pink-600 text-white shadow-md"
+                          : "bg-white border-gray-300 hover:bg-pink-50/50"
                       )}
                     >
                       <span className="truncate">Custom Input</span>
@@ -474,7 +472,7 @@ export default function RelationshipHeadcanonPage() {
                   </div>
                   {relationshipTypeMode === "list" ? (
                     <Select value={relationshipType} onValueChange={setRelationshipType}>
-                      <SelectTrigger className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white">
+                      <SelectTrigger className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all rounded-xl rounded-lg bg-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -491,7 +489,7 @@ export default function RelationshipHeadcanonPage() {
                         value={customRelationshipType}
                         onChange={(e) => setCustomRelationshipType(e.target.value)}
                         placeholder="Enter custom relationship type (eg: Rival, Best Friend, Mentor, Sibling, Colleague, etc.)"
-                        className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white text-sm"
+                        className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all rounded-xl rounded-lg bg-white text-sm"
                       />
                       <p className="text-xs text-gray-500 break-words">
                         Examples: Rival, Best Friend, Mentor, Sibling, Colleague, etc.
@@ -506,7 +504,7 @@ export default function RelationshipHeadcanonPage() {
                     Tone
                   </Label>
                   <Select value={tone} onValueChange={setTone}>
-                    <SelectTrigger id="tone" className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white">
+                    <SelectTrigger id="tone" className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all rounded-xl rounded-lg bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -525,7 +523,7 @@ export default function RelationshipHeadcanonPage() {
                     Length
                   </Label>
                   <Select value={length} onValueChange={setLength}>
-                    <SelectTrigger id="length" className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg bg-white">
+                    <SelectTrigger id="length" className="h-10 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all rounded-xl rounded-lg bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -548,7 +546,7 @@ export default function RelationshipHeadcanonPage() {
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
                     placeholder="Enter additional context about the relationship, setting, or specific scenario you want to explore (optional)"
-                    className="min-h-24 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg resize-none bg-white"
+                    className="min-h-24 border border-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all rounded-xl rounded-lg resize-none bg-white"
                   />
                 </div>
 
@@ -560,7 +558,7 @@ export default function RelationshipHeadcanonPage() {
                         <Button
                           onClick={handleGenerate}
                           disabled={characters.filter(c => c.trim()).length === 0 || isGenerating || !isAuthenticated || authLoading}
-                          className="w-full h-11 md:h-12 text-sm md:text-base font-semibold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-md hover:shadow-lg rounded-lg relative"
+                          className="w-full h-11 text-sm font-medium bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-sm hover:shadow-md rounded-xl relative transition-all duration-200"
                         >
                           {!isAuthenticated && !authLoading && (
                             <Lock className="absolute left-3 h-4 w-4" />
@@ -600,7 +598,7 @@ export default function RelationshipHeadcanonPage() {
           {/* RIGHT PANEL: Ready to Generate / Generated Headcanon */}
           <div className="flex-1 w-full lg:max-w-xl space-y-4 md:space-y-6">
             {isGenerating && !generatedHeadcanon ? (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+              <Card className="border border-pink-100 bg-white shadow-sm rounded-2xl p-6">
                 <div className="mb-4 md:mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-2">
                     Your Generated Relationship Headcanon
@@ -668,7 +666,7 @@ export default function RelationshipHeadcanonPage() {
                 </div>
               </Card>
             ) : !generatedHeadcanon ? (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+              <Card className="border border-pink-100 bg-white shadow-sm rounded-2xl p-6">
                 <div className="mb-4 md:mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Heart className="h-5 w-5 md:h-6 md:w-6 text-pink-600 flex-shrink-0" />
@@ -759,7 +757,7 @@ export default function RelationshipHeadcanonPage() {
                 </div>
               </Card>
             ) : (
-              <Card className="border-2 border-gray-200/60 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl md:rounded-2xl p-4 md:p-6">
+              <Card className="border border-pink-100 bg-white shadow-sm rounded-2xl p-6">
                 <div className="mb-4 md:mb-6">
                   <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     Your Generated Relationship Headcanon
@@ -868,7 +866,7 @@ export default function RelationshipHeadcanonPage() {
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="w-full h-10 md:h-11 text-xs md:text-sm font-medium bg-pink-600 hover:bg-pink-700 text-white rounded-lg"
+                    className="w-full h-10 text-sm font-medium bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                   >
                     <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
                     Regenerate

@@ -143,7 +143,7 @@ export function GoogleLoginButton() {
 
     return (
       <div className="flex items-center gap-2">
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-700 border border-cyan-200/50 shadow-sm">
           <Avatar className="h-8 w-8">
             {avatarUrl ? (
               <AvatarImage src={avatarUrl} alt={userName} />
@@ -159,7 +159,7 @@ export function GoogleLoginButton() {
         <Button
           onClick={handleLogout}
           variant="outline"
-          className="border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+          className="border-cyan-300 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-400 transition-all"
         >
           <LogOut className="h-4 w-4 mr-2" />
           <span className="hidden sm:inline">Sign Out</span>
@@ -176,10 +176,11 @@ export function GoogleLoginButton() {
         e.stopPropagation()
         handleLogin()
       }}
-      className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-md hover:shadow-lg"
+      size="sm"
+      className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-300 text-xs md:text-sm font-semibold h-8 md:h-9"
       type="button"
     >
-      <LogIn className="h-4 w-4 mr-2" />
+      <LogIn className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
       <span className="hidden sm:inline">Sign in with Google</span>
       <span className="sm:hidden">Sign in</span>
     </Button>
