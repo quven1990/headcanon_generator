@@ -55,17 +55,26 @@ export function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                    "relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
                     isActive
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      ? "bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 shadow-sm border border-blue-200/50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50/80"
                   )}
                 >
+                  {/* 选中状态的装饰性指示器 */}
+                  {isActive && (
+                    <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                  )}
                   <Icon className={cn(
-                    "h-4 w-4 transition-colors",
-                    isActive ? "text-gray-900" : "text-gray-500"
+                    "h-4 w-4 transition-all duration-300",
+                    isActive 
+                      ? "text-blue-600 scale-110" 
+                      : "text-gray-500 group-hover:text-gray-700"
                   )} />
-                  <span>{item.name}</span>
+                  <span className={cn(
+                    "relative z-10",
+                    isActive ? "font-semibold" : "font-medium"
+                  )}>{item.name}</span>
                 </Link>
               )
             })}
@@ -84,17 +93,26 @@ export function Navbar() {
                   key={item.name}
                   href={item.href}
                     className={cn(
-                      "flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 min-w-fit",
+                      "relative flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-300 min-w-fit",
                       isActive
-                        ? "bg-gray-100 text-gray-900"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "bg-gradient-to-br from-blue-50 to-purple-50 text-blue-700 shadow-sm border border-blue-200/50"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50/80"
                     )}
                 >
+                  {/* 选中状态的装饰性指示器 */}
+                  {isActive && (
+                    <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                  )}
                   <Icon className={cn(
-                    "h-4 w-4 transition-colors",
-                    isActive ? "text-gray-900" : "text-gray-500"
+                    "h-4 w-4 transition-all duration-300",
+                    isActive 
+                      ? "text-blue-600 scale-110" 
+                      : "text-gray-500"
                   )} />
-                  <span className="whitespace-nowrap text-[10px] leading-tight">{item.name === "Home" ? "Home" : item.name.split(" ")[0]}</span>
+                  <span className={cn(
+                    "relative z-10 whitespace-nowrap text-[10px] leading-tight",
+                    isActive ? "font-semibold" : "font-medium"
+                  )}>{item.name === "Home" ? "Home" : item.name.split(" ")[0]}</span>
                 </Link>
               )
             })}

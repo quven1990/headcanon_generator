@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 export function GoogleLoginButton() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -95,6 +96,9 @@ export function GoogleLoginButton() {
   }
 
   const handleLogout = async () => {
+    if (isLoggingOut) return // 防止重复点击
+    
+    setIsLoggingOut(true)
     try {
       const supabase = createClient()
       const { error } = await supabase.auth.signOut()
@@ -106,7 +110,10 @@ export function GoogleLoginButton() {
         title: "Signed Out",
         description: "You have been signed out successfully",
       })
-      router.refresh()
+      // 使用 setTimeout 确保状态更新后再刷新
+      setTimeout(() => {
+        router.refresh()
+      }, 100)
     } catch (error) {
       console.error('Logout error:', error)
       toast({
@@ -114,6 +121,7 @@ export function GoogleLoginButton() {
         description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       })
+      setIsLoggingOut(false)
     }
   }
 
@@ -121,7 +129,7 @@ export function GoogleLoginButton() {
     return (
       <Button
         disabled
-        className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md"
+        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md"
       >
         <LogIn className="h-4 w-4 mr-2 animate-spin" />
         <span className="hidden sm:inline">Loading...</span>
@@ -142,48 +150,95 @@ export function GoogleLoginButton() {
       .slice(0, 2) || 'U'
 
     return (
-      <div className="flex items-center gap-2">
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-700 border border-cyan-200/50 shadow-sm">
-          <Avatar className="h-8 w-8">
-            {avatarUrl ? (
-              <AvatarImage src={avatarUrl} alt={userName} />
-            ) : null}
-            <AvatarFallback className="bg-cyan-100 text-cyan-700 text-xs font-medium">
-              {userInitials}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-sm font-medium">
-            {userName}
-          </span>
+      <div className="group relative ml-4">
+        {/* 桌面端：头像和名字区域，Sign Out 在下方 */}
+        <div className="hidden sm:block">
+          <div className="relative">
+            {/* 头像和名字区域 - 与其他导航项对齐 */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 border border-blue-200/50 shadow-sm cursor-pointer transition-all hover:shadow-md">
+              <Avatar className="h-8 w-8 flex-shrink-0">
+                {avatarUrl ? (
+                  <AvatarImage src={avatarUrl} alt={userName} />
+                ) : null}
+                <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 text-blue-700 text-xs font-medium">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium whitespace-nowrap">
+                {userName}
+              </span>
+            </div>
+            {/* Sign Out 按钮 - 默认隐藏，hover 时显示在下方，绝对定位 */}
+            <div className="absolute top-full left-0 right-0 mt-2 flex justify-center z-10">
+              <Button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                variant="ghost"
+                size="default"
+                className="bg-white/95 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-red-50 hover:border-red-200 hover:text-red-600 active:bg-red-100 active:scale-[0.98] transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto whitespace-nowrap shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed min-w-[110px] h-9 px-4 rounded-lg font-medium text-sm"
+              >
+                {isLoggingOut ? (
+                  <>
+                    <LogOut className="h-4 w-4 mr-2 animate-spin text-red-500" />
+                    <span className="text-red-600">Signing out...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="h-4 w-4 mr-2 transition-transform group-hover:translate-x-0.5" />
+                    <span>Sign Out</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button
-          onClick={handleLogout}
-          variant="outline"
-          className="border-cyan-300 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-400 transition-all"
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Sign Out</span>
-          <span className="sm:hidden">Sign Out</span>
-        </Button>
+        {/* 移动端：横向布局 */}
+        <div className="flex sm:hidden items-center gap-2">
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 border border-blue-200/50 shadow-sm">
+            <Avatar className="h-7 w-7 flex-shrink-0">
+              {avatarUrl ? (
+                <AvatarImage src={avatarUrl} alt={userName} />
+              ) : null}
+              <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 text-blue-700 text-xs font-medium">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <Button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            variant="ghost"
+            size="default"
+            className="bg-white/95 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-red-50 hover:border-red-200 hover:text-red-600 active:bg-red-100 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed h-9 px-3 rounded-lg"
+          >
+            {isLoggingOut ? (
+              <LogOut className="h-4 w-4 animate-spin text-red-500" />
+            ) : (
+              <LogOut className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
-    <Button
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        handleLogin()
-      }}
-      size="sm"
-      className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-300 text-xs md:text-sm font-semibold h-8 md:h-9"
-      type="button"
-    >
-      <LogIn className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
-      <span className="hidden sm:inline">Sign in with Google</span>
-      <span className="sm:hidden">Sign in</span>
-    </Button>
+    <div className="ml-4">
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          handleLogin()
+        }}
+        size="sm"
+        className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-300 text-xs md:text-sm font-semibold h-8 md:h-9"
+        type="button"
+      >
+        <LogIn className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
+        <span className="hidden sm:inline">Sign in with Google</span>
+        <span className="sm:hidden">Sign in</span>
+      </Button>
+    </div>
   )
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,13 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Heart, Sparkles, Rocket, Lightbulb, RefreshCw, Plus, X, LogIn, Lock } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
@@ -70,8 +79,9 @@ const examples = [
 
 export default function RelationshipHeadcanonPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const { toast } = useToast()
-  const { isAuthenticated, loading: authLoading } = useAuth()
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
 
   const [characters, setCharacters] = useState<string[]>([""])
   const [fandom, setFandom] = useState("")
@@ -93,6 +103,8 @@ export default function RelationshipHeadcanonPage() {
   } | null>(null)
   const [isLoadingSection, setIsLoadingSection] = useState<string | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const [pendingGenerate, setPendingGenerate] = useState(false)
 
   const handleAddCharacter = () => {
     if (characters.length < 5) {
@@ -173,17 +185,42 @@ export default function RelationshipHeadcanonPage() {
     }
   }
 
-  const handleGenerate = async () => {
-    // 检查用户是否已登录
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please sign in with Google to generate headcanons.",
-        variant: "destructive",
-      })
-      return
+  // 监听登录状态，如果登录成功且有待处理的生成请求，则继续生成
+  useEffect(() => {
+    // 检查 URL 中是否有 pendingGenerate 参数（从回调返回时）
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const shouldGenerate = urlParams.get('pendingGenerate') === 'true'
+      if (shouldGenerate) {
+        // 清除 URL 参数
+        const newUrl = window.location.pathname
+        window.history.replaceState({}, '', newUrl)
+        setPendingGenerate(true)
+      }
     }
 
+    if (isAuthenticated && pendingGenerate && !authLoading) {
+      setPendingGenerate(false)
+      setShowLoginDialog(false)
+      // 延迟一下确保状态更新完成
+      setTimeout(() => {
+        executeGenerate()
+      }, 300)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, pendingGenerate, authLoading])
+
+  const handleGenerate = () => {
+    // 检查用户是否已登录
+    if (!isAuthenticated) {
+      setShowLoginDialog(true)
+      setPendingGenerate(true)
+      return
+    }
+    executeGenerate()
+  }
+
+  const executeGenerate = async () => {
     const validCharacters = characters.filter(c => c.trim())
     if (validCharacters.length === 0) {
       toast({
@@ -347,6 +384,44 @@ export default function RelationshipHeadcanonPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* LEFT PANEL: Relationship Generation Parameters */}
           <div className="flex-1 w-full lg:max-w-xl space-y-5">
+            {/* Login Dialog */}
+            <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Lock className="h-5 w-5 text-pink-600" />
+                    Sign In Required
+                  </DialogTitle>
+                  <DialogDescription className="pt-2">
+                    Please sign in with Google to generate headcanons. After signing in, your generation will start automatically.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="sm:justify-start gap-2">
+                  <Button
+                    onClick={() => {
+                      // 保存当前页面路径，登录后返回
+                      const currentPath = pathname || "/relationship-headcanon"
+                      window.location.href = `/api/auth/login?next=${encodeURIComponent(currentPath + '?pendingGenerate=true')}`
+                    }}
+                    className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white"
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In with Google
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowLoginDialog(false)
+                      setPendingGenerate(false)
+                    }}
+                    className="w-full sm:w-auto"
+                  >
+                    Cancel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <Card className="border border-pink-100 bg-white shadow-sm rounded-2xl p-6">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">
@@ -358,27 +433,6 @@ export default function RelationshipHeadcanonPage() {
               </div>
 
               <div className="space-y-4">
-                {/* Login Required Alert */}
-                {!isAuthenticated && !authLoading && (
-                  <Alert className="border border-pink-200 bg-pink-50 rounded-xl">
-                    <LogIn className="h-4 w-4 text-pink-600" />
-                    <AlertDescription className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="font-medium text-pink-900 mb-1 text-sm">Sign in required</p>
-                        <p className="text-xs text-pink-700">
-                          Sign in to generate headcanons.
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => window.location.href = "/api/auth/login"}
-                        size="sm"
-                        className="bg-pink-500 hover:bg-pink-600 text-white whitespace-nowrap text-xs h-8 px-3 rounded-lg"
-                      >
-                        Sign In
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
-                )}
 
                 {/* Characters */}
                 <div className="space-y-2">
@@ -557,23 +611,15 @@ export default function RelationshipHeadcanonPage() {
                       <div className="w-full">
                         <Button
                           onClick={handleGenerate}
-                          disabled={characters.filter(c => c.trim()).length === 0 || isGenerating || !isAuthenticated || authLoading}
+                          disabled={characters.filter(c => c.trim()).length === 0 || isGenerating || authLoading}
                           className="w-full h-11 text-sm font-medium bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-sm hover:shadow-md rounded-xl relative transition-all duration-200"
                         >
-                          {!isAuthenticated && !authLoading && (
-                            <Lock className="absolute left-3 h-4 w-4" />
-                          )}
                           {isGenerating ? (
                             <>
                               <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
                               <span className="truncate">
                                 {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
                               </span>
-                            </>
-                          ) : !isAuthenticated ? (
-                            <>
-                              <Heart className={`mr-2 h-4 w-4 md:h-5 md:w-5 ${!isAuthenticated ? 'opacity-0' : ''}`} />
-                              <span className="truncate">Sign in to Generate</span>
                             </>
                           ) : (
                             <>
@@ -584,11 +630,6 @@ export default function RelationshipHeadcanonPage() {
                         </Button>
                       </div>
                     </TooltipTrigger>
-                    {!isAuthenticated && !authLoading && (
-                      <TooltipContent>
-                        <p>Please sign in to generate headcanons</p>
-                      </TooltipContent>
-                    )}
                   </Tooltip>
                 </TooltipProvider>
               </div>
@@ -785,8 +826,32 @@ export default function RelationshipHeadcanonPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 md:gap-2 text-xs text-gray-500 flex-shrink-0">
-                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
-                    <span className="hidden sm:inline">Just now</span>
+                    {user ? (
+                      <>
+                        <Avatar className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0">
+                          {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                            <AvatarImage 
+                              src={user.user_metadata.avatar_url || user.user_metadata.picture} 
+                              alt={user.user_metadata?.full_name || user.user_metadata?.name || "User"} 
+                            />
+                          ) : null}
+                          <AvatarFallback className="bg-pink-100 text-pink-700 text-[10px] md:text-xs font-medium">
+                            {(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'U')
+                              .split(' ')
+                              .map((n: string) => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden sm:inline">Just now</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <span className="hidden sm:inline">Just now</span>
+                      </>
+                    )}
                   </div>
                 </div>
 

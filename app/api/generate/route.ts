@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@supabase/ssr"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -9,12 +9,53 @@ export async function POST(req: NextRequest) {
   })
 
   try {
+    // 在 API 路由中，需要使用 NextRequest 来创建 Supabase 客户端
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.log(`[${timestamp}] ❌ Supabase 环境变量未配置`)
+      return NextResponse.json(
+        { error: "Server configuration error. Please contact support." },
+        { status: 500 }
+      )
+    }
+
+    let supabaseResponse = NextResponse.next({
+      request: {
+        headers: req.headers,
+      },
+    })
+
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => req.cookies.set(name, value))
+            supabaseResponse = NextResponse.next({
+              request: {
+                headers: req.headers,
+              },
+            })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
     // 检查用户是否已登录（服务器端验证）
-    const supabase = createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
       console.log(`[${timestamp}] ❌ 未授权访问 - 用户未登录`)
+      console.log(`   错误信息: ${authError?.message || 'No user found'}`)
       return NextResponse.json(
         { error: "Authentication required. Please sign in to generate headcanons." },
         { status: 401 }
@@ -176,7 +217,7 @@ Generate the headcanon now:`
       },
     }
 
-    const response = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
+    const apiResponse = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -188,16 +229,16 @@ Generate the headcanon now:`
     const requestDuration = Date.now() - startTime
     console.log(`⏱️  请求耗时: ${requestDuration}ms`)
 
-    if (!response.ok) {
-      const errorData = await response.text()
+    if (!apiResponse.ok) {
+      const errorData = await apiResponse.text()
       console.error("❌ API 请求失败!")
-      console.error(`   状态码: ${response.status} ${response.statusText}`)
+      console.error(`   状态码: ${apiResponse.status} ${apiResponse.statusText}`)
       console.error(`   错误信息: ${errorData}`)
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`)
+      throw new Error(`API request failed: ${apiResponse.status} ${apiResponse.statusText}`)
     }
 
     console.log("✅ API 请求成功!")
-    const data = await response.json()
+    const data = await apiResponse.json()
     
     // 提取生成的文本
     const headcanon = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || ""

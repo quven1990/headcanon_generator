@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,13 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Sparkles, Target, Rocket, Lightbulb, RefreshCw, LogIn, Lock } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
@@ -67,6 +76,7 @@ const examples = [
 
 export default function CharacterHeadcanonPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const { toast } = useToast()
   const { user, loading: authLoading, isAuthenticated } = useAuth()
 
@@ -88,6 +98,8 @@ export default function CharacterHeadcanonPage() {
   const [isLoadingSection, setIsLoadingSection] = useState<string | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [totalTime, setTotalTime] = useState<number>(0)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const [pendingGenerate, setPendingGenerate] = useState(false)
 
   const handleExampleClick = (example: typeof examples[0]) => {
     setCharacterName(example.name)
@@ -147,17 +159,42 @@ export default function CharacterHeadcanonPage() {
     }
   }
 
-  const handleGenerate = async () => {
-    // 检查用户是否已登录
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please sign in with Google to generate headcanons.",
-        variant: "destructive",
-      })
-      return
+  // 监听登录状态，如果登录成功且有待处理的生成请求，则继续生成
+  useEffect(() => {
+    // 检查 URL 中是否有 pendingGenerate 参数（从回调返回时）
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const shouldGenerate = urlParams.get('pendingGenerate') === 'true'
+      if (shouldGenerate) {
+        // 清除 URL 参数
+        const newUrl = window.location.pathname
+        window.history.replaceState({}, '', newUrl)
+        setPendingGenerate(true)
+      }
     }
 
+    if (isAuthenticated && pendingGenerate && !authLoading) {
+      setPendingGenerate(false)
+      setShowLoginDialog(false)
+      // 延迟一下确保状态更新完成
+      setTimeout(() => {
+        executeGenerate()
+      }, 300)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, pendingGenerate, authLoading])
+
+  const handleGenerate = () => {
+    // 检查用户是否已登录
+    if (!isAuthenticated) {
+      setShowLoginDialog(true)
+      setPendingGenerate(true)
+      return
+    }
+    executeGenerate()
+  }
+
+  const executeGenerate = async () => {
     if (!characterName.trim()) {
       toast({
         title: "Missing Character",
@@ -280,10 +317,10 @@ export default function CharacterHeadcanonPage() {
         {/* Hero Section */}
         <div className="mb-12 text-center">
           <div className="mb-6 flex items-center justify-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-sm">
               <Sparkles className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent md:text-5xl">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent md:text-5xl">
               Character Headcanon Generator
             </h1>
           </div>
@@ -304,9 +341,9 @@ export default function CharacterHeadcanonPage() {
               <Target className="h-3.5 w-3.5 text-purple-600" />
               <span className="text-xs font-medium text-purple-700">Full Control</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-50 border border-cyan-200">
-              <Rocket className="h-3.5 w-3.5 text-cyan-600" />
-              <span className="text-xs font-medium text-cyan-700">Quick & Easy</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
+              <Rocket className="h-3.5 w-3.5 text-blue-600" />
+              <span className="text-xs font-medium text-blue-700">Quick & Easy</span>
             </div>
           </div>
         </div>
@@ -314,6 +351,44 @@ export default function CharacterHeadcanonPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* LEFT PANEL: Custom Generation Parameters */}
           <div className="flex-1 w-full lg:max-w-xl space-y-5">
+            {/* Login Dialog */}
+            <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Lock className="h-5 w-5 text-blue-600" />
+                    Sign In Required
+                  </DialogTitle>
+                  <DialogDescription className="pt-2">
+                    Please sign in with Google to generate headcanons. After signing in, your generation will start automatically.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="sm:justify-start gap-2">
+                  <Button
+                    onClick={() => {
+                      // 保存当前页面路径，登录后返回
+                      const currentPath = pathname || "/character-headcanon"
+                      window.location.href = `/api/auth/login?next=${encodeURIComponent(currentPath + '?pendingGenerate=true')}`
+                    }}
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In with Google
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowLoginDialog(false)
+                      setPendingGenerate(false)
+                    }}
+                    className="w-full sm:w-auto"
+                  >
+                    Cancel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <Card className="border border-blue-100 bg-white shadow-sm rounded-2xl p-6">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">
@@ -325,27 +400,6 @@ export default function CharacterHeadcanonPage() {
               </div>
 
               <div className="space-y-4">
-                {/* Login Required Alert */}
-                {!isAuthenticated && !authLoading && (
-                  <Alert className="border border-blue-200 bg-blue-50 rounded-xl">
-                    <LogIn className="h-4 w-4 text-blue-600" />
-                    <AlertDescription className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="font-medium text-blue-900 mb-1 text-sm">Sign in required</p>
-                        <p className="text-xs text-blue-700">
-                          Sign in to generate headcanons.
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => window.location.href = "/api/auth/login"}
-                        size="sm"
-                        className="bg-blue-500 hover:bg-blue-600 text-white whitespace-nowrap text-xs h-8 px-3 rounded-lg"
-                      >
-                        Sign In
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
-                )}
 
                 {/* Character */}
                 <div className="space-y-2">
@@ -453,23 +507,15 @@ export default function CharacterHeadcanonPage() {
                       <div className="w-full">
                         <Button
                           onClick={handleGenerate}
-                          disabled={!characterName.trim() || isGenerating || !isAuthenticated || authLoading}
-                          className="w-full h-11 text-sm font-medium bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-sm hover:shadow-md rounded-xl relative transition-all duration-200"
+                          disabled={!characterName.trim() || isGenerating || authLoading}
+                          className="w-full h-11 text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white shadow-sm hover:shadow-md rounded-xl relative transition-all duration-200"
                         >
-                          {!isAuthenticated && !authLoading && (
-                            <Lock className="absolute left-3 h-4 w-4" />
-                          )}
                           {isGenerating ? (
                             <>
                               <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
                               <span className="truncate">
                                 {countdown !== null ? `Generating... ${countdown}s` : "Generating..."}
                               </span>
-                            </>
-                          ) : !isAuthenticated ? (
-                            <>
-                              <Sparkles className={`mr-2 h-4 w-4 md:h-5 md:w-5 ${!isAuthenticated ? 'opacity-0' : ''}`} />
-                              <span className="truncate">Sign in to Generate</span>
                             </>
                           ) : (
                             <>
@@ -480,11 +526,6 @@ export default function CharacterHeadcanonPage() {
                         </Button>
                       </div>
                     </TooltipTrigger>
-                    {!isAuthenticated && !authLoading && (
-                      <TooltipContent>
-                        <p>Please sign in to generate headcanons</p>
-                      </TooltipContent>
-                    )}
                   </Tooltip>
                 </TooltipProvider>
               </div>
@@ -522,41 +563,41 @@ export default function CharacterHeadcanonPage() {
                   </div>
 
                   {/* Core Idea Loading */}
-                  <div className="p-4 rounded-lg bg-orange-50 border border-orange-100">
+                  <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                      <h4 className="text-sm font-semibold text-orange-900">Core Idea</h4>
+                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      <h4 className="text-sm font-semibold text-blue-900">Core Idea</h4>
                     </div>
                     <div className="space-y-2">
-                      <div className="h-4 bg-orange-100 rounded animate-pulse w-full"></div>
-                      <div className="h-4 bg-orange-100 rounded animate-pulse w-5/6"></div>
+                      <div className="h-4 bg-blue-100 rounded animate-pulse w-full"></div>
+                      <div className="h-4 bg-blue-100 rounded animate-pulse w-5/6"></div>
                     </div>
                   </div>
 
                   {/* Development Loading */}
-                  <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
+                  <div className="p-4 rounded-lg bg-purple-50 border border-purple-100">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <h4 className="text-sm font-semibold text-blue-900">Development</h4>
+                      <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                      <h4 className="text-sm font-semibold text-purple-900">Development</h4>
                     </div>
                     <div className="space-y-2">
-                      <div className="h-4 bg-blue-100 rounded animate-pulse w-full"></div>
-                      <div className="h-4 bg-blue-100 rounded animate-pulse w-4/5"></div>
-                      <div className="h-4 bg-blue-100 rounded animate-pulse w-3/4"></div>
+                      <div className="h-4 bg-purple-100 rounded animate-pulse w-full"></div>
+                      <div className="h-4 bg-purple-100 rounded animate-pulse w-4/5"></div>
+                      <div className="h-4 bg-purple-100 rounded animate-pulse w-3/4"></div>
                     </div>
                   </div>
 
                   {/* Moment Loading */}
-                  <div className="p-4 rounded-lg bg-green-50 border border-green-100">
+                  <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      <h4 className="text-sm font-semibold text-green-900">Moment</h4>
+                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                      <h4 className="text-sm font-semibold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent">Moment</h4>
                     </div>
                     <div className="space-y-2">
-                      <div className="h-4 bg-green-100 rounded animate-pulse w-full"></div>
-                      <div className="h-4 bg-green-100 rounded animate-pulse w-5/6"></div>
-                      <div className="h-4 bg-green-100 rounded animate-pulse w-4/5"></div>
-                      <div className="h-4 bg-green-100 rounded animate-pulse w-3/4"></div>
+                      <div className="h-4 bg-blue-100 rounded animate-pulse w-full"></div>
+                      <div className="h-4 bg-purple-100 rounded animate-pulse w-5/6"></div>
+                      <div className="h-4 bg-blue-100 rounded animate-pulse w-4/5"></div>
+                      <div className="h-4 bg-purple-100 rounded animate-pulse w-3/4"></div>
                     </div>
                   </div>
 
@@ -690,53 +731,79 @@ export default function CharacterHeadcanonPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 md:gap-2 text-xs text-gray-500 flex-shrink-0">
-                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
-                    <span className="hidden sm:inline">Just now</span>
+                    {user ? (
+                      <>
+                        <Avatar className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0">
+                          {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                            <AvatarImage 
+                              src={user.user_metadata.avatar_url || user.user_metadata.picture} 
+                              alt={user.user_metadata?.full_name || user.user_metadata?.name || "User"} 
+                            />
+                          ) : null}
+                          <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 text-blue-700 text-[10px] md:text-xs font-medium">
+                            {(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'U')
+                              .split(' ')
+                              .map((n: string) => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden sm:inline">Just now</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <span className="hidden sm:inline">Just now</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 {/* Story Sections */}
                 <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
-                  {/* Core Idea - Orange */}
+                  {/* Core Idea - Blue */}
                   <div className={cn(
                     "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "coreIdea"
-                      ? "bg-orange-50 border-orange-200 animate-pulse"
-                      : "bg-orange-50 border-orange-100"
-                  )}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0"></div>
-                      <h4 className="text-xs md:text-sm font-semibold text-orange-900">Core Idea</h4>
-                    </div>
-                    {isLoadingSection === "coreIdea" ? (
-                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
-                        <span>Generating...</span>
-                      </div>
-                    ) : (
-                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
-                        {generatedHeadcanon.coreIdea}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Development - Blue */}
-                  <div className={cn(
-                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
-                    isLoadingSection === "development"
                       ? "bg-blue-50 border-blue-200 animate-pulse"
-                      : generatedHeadcanon.development
+                      : generatedHeadcanon.coreIdea
                       ? "bg-blue-50 border-blue-100"
                       : "bg-gray-50 border-gray-100 opacity-50"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></div>
-                      <h4 className="text-xs md:text-sm font-semibold text-blue-900">Development</h4>
+                      <h4 className="text-xs md:text-sm font-semibold text-blue-900">Core Idea</h4>
+                    </div>
+                    {isLoadingSection === "coreIdea" ? (
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-blue-600">
+                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
+                        <span>Generating Core Idea...</span>
+                      </div>
+                    ) : generatedHeadcanon.coreIdea ? (
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
+                        {generatedHeadcanon.coreIdea}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {/* Development - Purple */}
+                  <div className={cn(
+                    "p-3 md:p-4 rounded-lg border transition-all duration-500",
+                    isLoadingSection === "development"
+                      ? "bg-purple-50 border-purple-200 animate-pulse"
+                      : generatedHeadcanon.development
+                      ? "bg-purple-50 border-purple-100"
+                      : "bg-gray-50 border-gray-100 opacity-50"
+                  )}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold text-purple-900">Development</h4>
                     </div>
                     {isLoadingSection === "development" ? (
-                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-purple-600">
                         <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
-                        <span>Generating...</span>
+                        <span>Generating Development...</span>
                       </div>
                     ) : generatedHeadcanon.development ? (
                       <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
@@ -745,23 +812,23 @@ export default function CharacterHeadcanonPage() {
                     ) : null}
                   </div>
 
-                  {/* Moment - Green */}
+                  {/* Moment - Blue-Purple Gradient */}
                   <div className={cn(
                     "p-3 md:p-4 rounded-lg border transition-all duration-500",
                     isLoadingSection === "moment"
-                      ? "bg-green-50 border-green-200 animate-pulse"
+                      ? "bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 animate-pulse"
                       : generatedHeadcanon.moment
-                      ? "bg-green-50 border-green-100"
+                      ? "bg-gradient-to-r from-blue-50 to-purple-50 border-blue-100"
                       : "bg-gray-50 border-gray-100 opacity-50"
                   )}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
-                      <h4 className="text-xs md:text-sm font-semibold text-green-900">Moment</h4>
+                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex-shrink-0"></div>
+                      <h4 className="text-xs md:text-sm font-semibold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent">Moment</h4>
                     </div>
                     {isLoadingSection === "moment" ? (
-                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
-                        <span>Generating...</span>
+                      <div className="flex items-center gap-2 text-xs md:text-sm bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <Sparkles className="h-3 w-3 md:h-4 md:w-4 animate-spin text-blue-600" />
+                        <span>Generating Moment...</span>
                       </div>
                     ) : generatedHeadcanon.moment ? (
                       <p className="text-xs md:text-sm text-gray-700 leading-relaxed break-words">
@@ -776,7 +843,7 @@ export default function CharacterHeadcanonPage() {
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="w-full h-10 text-sm font-medium bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:hover:bg-gray-400 text-white rounded-xl shadow-sm hover:shadow transition-all duration-200"
+                    className="w-full h-10 text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl shadow-sm hover:shadow transition-all duration-200"
                   >
                     <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
                     Regenerate

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
+  const next = requestUrl.searchParams.get('next') || '/'
   
   // 检查环境变量（支持多种变量名）
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${requestUrl.origin}/auth/callback`,
+        redirectTo: `${requestUrl.origin}/auth/callback?next=${encodeURIComponent(next)}`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
