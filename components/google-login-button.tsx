@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { LogIn, LogOut, User } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -14,6 +14,7 @@ export function GoogleLoginButton() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const hasInitialized = useRef(false) // 跟踪是否已经初始化
 
   useEffect(() => {
     // 检查 URL 中的错误参数（使用 window.location 而不是 useSearchParams）
@@ -64,20 +65,36 @@ export function GoogleLoginButton() {
         }
       } finally {
         setLoading(false)
+        // 标记为已初始化
+        hasInitialized.current = true
       }
     }
 
     checkUser()
+
+    // 检查 URL 中是否有 loginSuccess 参数（从回调返回时）
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const loginSuccess = urlParams.get('loginSuccess')
+      if (loginSuccess === 'true') {
+        // 显示登录成功提示
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        })
+        // 清除 URL 参数
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString().replace(/loginSuccess=true&?/, '').replace(/&loginSuccess=true/, '') : '')
+        window.history.replaceState({}, '', newUrl.replace(/\?$/, ''))
+      }
+    }
 
     // 监听认证状态变化
     const supabase = createClient()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         setUser(session?.user ?? null)
-        toast({
-          title: "Login Successful",
-          description: "Welcome back!",
-        })
+        // 不在 onAuthStateChange 中显示提示，因为页面刷新也会触发
+        // 提示已经在上面通过 URL 参数检查显示
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
       }

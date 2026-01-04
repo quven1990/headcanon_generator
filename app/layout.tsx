@@ -8,8 +8,16 @@ import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const _geist = Geist({ 
+  subsets: ["latin"],
+  display: 'swap', // 字体加载时使用系统字体，加载完成后切换
+  preload: true, // 预加载字体
+})
+const _geistMono = Geist_Mono({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: false, // 非关键字体不预加载
+})
 
 export const metadata: Metadata = {
   // 1. Title 页面标签 - 50-60字符，关键词在开头，末尾加域名

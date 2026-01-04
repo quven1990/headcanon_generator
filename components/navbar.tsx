@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Sparkles, Heart, Home } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { GoogleLoginButton } from "@/components/google-login-button"
+import { GoogleLoginButtonLazy } from "@/components/google-login-button-lazy"
 import { Toaster } from "@/components/ui/toaster"
 
 const navigation = [
@@ -79,7 +79,7 @@ export function Navbar() {
               )
             })}
             <div className="ml-3 pl-3 border-l border-gray-200">
-              <GoogleLoginButton />
+              <GoogleLoginButtonLazy />
             </div>
           </div>
 
@@ -117,7 +117,7 @@ export function Navbar() {
               )
             })}
             <div className="ml-2 pl-2 border-l border-gray-200">
-              <GoogleLoginButton />
+              <GoogleLoginButtonLazy />
             </div>
           </div>
         </div>
