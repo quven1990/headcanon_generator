@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import HomePageClient from "./home-page-client"
+import { HomePageContent } from "./home-page-content"
 
 // 1. Title 页面标签 - 50-60字符，关键词在开头，末尾加域名
 export const metadata: Metadata = {
@@ -35,6 +35,7 @@ export const metadata: Metadata = {
   ],
 }
 
+// 服务端组件 - 确保所有 SEO 内容都在服务端渲染
 export default function HomePage() {
-  return <HomePageClient />
+  return <HomePageContent />
 }

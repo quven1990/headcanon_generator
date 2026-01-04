@@ -68,12 +68,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`font-sans antialiased`}>
-        {/* Google tag (gtag.js) - 使用beforeInteractive策略，Next.js会自动放在head中，紧跟在head元素之后 */}
+        {/* Google tag (gtag.js) - 使用afterInteractive策略，不阻塞页面渲染 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XE3TDNW61V"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="beforeInteractive">
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

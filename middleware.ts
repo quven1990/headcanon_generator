@@ -2,6 +2,26 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  // 跳过静态资源和公共页面（不需要认证检查）
+  // 这些页面对 SEO 很重要，不应该有认证延迟
+  const publicPaths = [
+    '/',
+    '/character-headcanon',
+    '/relationship-headcanon',
+  ]
+
+  // 只对 API 路由和需要认证的页面执行认证检查
+  const needsAuth = pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/login')
+
+  // 如果是公共页面，直接跳过认证检查，减少 TTFB
+  if (!needsAuth && publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
+    return NextResponse.next({
+      request,
+    })
+  }
+
   // 支持多种环境变量名称
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
@@ -38,12 +58,14 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // 刷新用户会话
-  try {
-    await supabase.auth.getUser()
-  } catch (error) {
-    // 忽略认证错误，继续处理请求
-    console.error('Middleware auth error:', error)
+  // 只对需要认证的路由刷新用户会话
+  if (needsAuth) {
+    try {
+      await supabase.auth.getUser()
+    } catch (error) {
+      // 忽略认证错误，继续处理请求
+      console.error('Middleware auth error:', error)
+    }
   }
 
   return supabaseResponse
