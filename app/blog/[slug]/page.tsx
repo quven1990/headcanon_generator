@@ -31,22 +31,36 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com"
   const postUrl = `${siteUrl}/blog/${slug}`
-  const excerpt = post.excerpt || post.content.substring(0, 160)
   
-  // 优化 title 长度，确保不超过 60 字符
-  let title = post.title
-  if (title.length > 45) {
-    title = title.substring(0, 42) + "..."
+  // 提取摘要，移除 markdown 格式
+  let excerpt = post.excerpt || post.content
+  // 移除 markdown 标题标记
+  excerpt = excerpt.replace(/^#+\s+/gm, '')
+  // 移除 markdown 链接，保留文本
+  excerpt = excerpt.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+  // 移除 markdown 粗体标记
+  excerpt = excerpt.replace(/\*\*([^*]+)\*\*/g, '$1')
+  // 移除多余空白
+  excerpt = excerpt.trim().replace(/\s+/g, ' ')
+  // 取前 160 字符
+  if (excerpt.length > 160) {
+    excerpt = excerpt.substring(0, 157) + "..."
   }
-  const fullTitle = `${title} | headcanonforge.com`
+  
+  // 优化 title 长度，确保不超过 60 字符（包括域名）
+  let title = post.title
+  const domainSuffix = " | headcanonforge.com"
+  const maxTitleLength = 60 - domainSuffix.length
+  if (title.length > maxTitleLength) {
+    title = title.substring(0, maxTitleLength - 3) + "..."
+  }
+  const fullTitle = `${title}${domainSuffix}`
   
   // 确保 description 在 150-160 字符之间
-  let description = excerpt.trim()
+  let description = excerpt
   if (description.length < 150) {
-    description = description + " Learn more about character headcanon creation, AI generator tips, and creative writing techniques."
-  }
-  if (description.length > 160) {
-    description = description.substring(0, 157) + "..."
+    const additional = " Learn more about character headcanon creation, AI generator tips, and creative writing techniques."
+    description = (description + additional).substring(0, 160)
   }
 
   return {

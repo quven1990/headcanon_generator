@@ -54,8 +54,10 @@ function getSlugFromFilename(filename: string): string {
 }
 
 // 获取所有博客文章
+// 注意：此函数从 blog-posts/ 目录读取文章（新写的文章）
+// headcanon-generator-blogs/ 目录用于存放抓取的文章，不会在页面上显示
 export function getAllBlogPosts(): BlogPost[] {
-  const blogsDirectory = path.join(process.cwd(), 'headcanon-generator-blogs')
+  const blogsDirectory = path.join(process.cwd(), 'blog-posts')
   
   if (!fs.existsSync(blogsDirectory)) {
     return []

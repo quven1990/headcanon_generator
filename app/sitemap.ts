@@ -60,8 +60,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }))
   
   // 自动获取所有博客文章并生成 sitemap 条目
-  // 注意：当你在 headcanon-generator-blogs/ 目录添加新的 .md 文件时，
+  // 注意：当你在 blog-posts/ 目录添加新的 .md 文件时，
   // 这些博客会自动出现在 sitemap 中，无需手动修改此文件
+  // headcanon-generator-blogs/ 目录用于存放抓取的文章，不会出现在 sitemap 中
   const blogPosts = getAllBlogPosts()
   const blogPagesSitemap: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${siteUrl}/blog/${post.slug}`,
