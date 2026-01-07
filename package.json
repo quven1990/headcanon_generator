@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "cursor-mcp-add": "node scripts/cursor-mcp-add.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
