@@ -140,13 +140,14 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
     const trimmed = line.trim()
 
     // 处理标题
+    // 注意：将 # 标题转换为 h2，因为页面模板已经有 h1 作为文章主标题
     if (trimmed.startsWith('# ')) {
       flushParagraph()
       flushList()
       elements.push(
-        <h1 key={elements.length} className="text-3xl font-bold text-gray-900 mb-4 mt-8">
+        <h2 key={elements.length} className="text-3xl font-bold text-gray-900 mb-4 mt-8">
           {trimmed.substring(2)}
-        </h1>
+        </h2>
       )
       return
     }
