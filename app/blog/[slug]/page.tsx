@@ -5,6 +5,7 @@ import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/blog"
 import { MarkdownRenderer } from "@/components/markdown-renderer"
 import { Calendar, User, ArrowLeft, ExternalLink } from "lucide-react"
 import { format } from "date-fns"
+import { BlogBreadcrumb } from "@/components/blog-breadcrumb"
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -113,6 +114,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <article className="mx-auto max-w-4xl px-6 py-12 sm:py-16 lg:py-20">
+        <BlogBreadcrumb postTitle={post.title} />
         {/* Back Button */}
         <Link
           href="/blog"

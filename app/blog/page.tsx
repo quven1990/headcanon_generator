@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getAllBlogPosts } from "@/lib/blog"
 import { Calendar, User, ArrowRight } from "lucide-react"
 import { format } from "date-fns"
+import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 
 export const metadata: Metadata = {
   title: "Headcanon Blog - AI Generator Guides & Tips | headcanonforge.com",
@@ -44,6 +45,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
+        <SEOBreadcrumb />
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-4">
@@ -54,38 +56,6 @@ export default function BlogPage() {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
             Discover expert guides on character headcanon creation, AI generator tips, and creative writing techniques
           </p>
-        </div>
-
-        {/* SEO Content Section */}
-        <div className="max-w-4xl mx-auto mb-12 prose prose-lg">
-          <section className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Master Character Headcanon Creation with Expert Guides
-            </h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to the Headcanon Generator Blog, your ultimate resource for creating compelling character backstories, developing rich personality traits, and exploring relationship dynamics. Whether you're a fanfiction writer, role-playing game enthusiast, or creative writer, our comprehensive guides will help you master the art of character development.
-            </p>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Our blog features in-depth articles covering everything from basic character development techniques to advanced AI-powered headcanon generation strategies. Learn how to use our free AI headcanon generator effectively, discover creative headcanon ideas for anime characters, and explore relationship dynamics that bring your stories to life.
-            </p>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Each article is carefully crafted to provide actionable insights, practical examples, and step-by-step guidance. From understanding the psychology behind character motivations to creating authentic dialogue and building emotional connections, our content covers all aspects of character headcanon creation.
-            </p>
-            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">
-              What You'll Learn
-            </h3>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
-              <li>Essential character development techniques and best practices</li>
-              <li>How to use AI headcanon generators effectively for inspiration</li>
-              <li>Creative headcanon ideas for anime, fanfiction, and original characters</li>
-              <li>Relationship headcanon development strategies</li>
-              <li>Tips for writing compelling character backstories</li>
-              <li>Advanced techniques for character psychology and motivation</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed">
-              Browse our articles below to find the perfect guide for your creative journey. Each post is designed to help you create more engaging, authentic, and memorable characters that resonate with your audience.
-            </p>
-          </section>
         </div>
 
         {/* Blog List */}
@@ -151,6 +121,38 @@ export default function BlogPage() {
             })}
           </div>
         )}
+
+        {/* SEO Content Section */}
+        <div className="max-w-4xl mx-auto mt-12 prose prose-lg">
+          <section className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              Master Character Headcanon Creation with Expert Guides
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Welcome to the Headcanon Generator Blog, your ultimate resource for creating compelling character backstories, developing rich personality traits, and exploring relationship dynamics. Whether you're a fanfiction writer, role-playing game enthusiast, or creative writer, our comprehensive guides will help you master the art of character development.
+            </p>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Our blog features in-depth articles covering everything from basic character development techniques to advanced AI-powered headcanon generation strategies. Learn how to use our free AI headcanon generator effectively, discover creative headcanon ideas for anime characters, and explore relationship dynamics that bring your stories to life.
+            </p>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Each article is carefully crafted to provide actionable insights, practical examples, and step-by-step guidance. From understanding the psychology behind character motivations to creating authentic dialogue and building emotional connections, our content covers all aspects of character headcanon creation.
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">
+              What You'll Learn
+            </h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
+              <li>Essential character development techniques and best practices</li>
+              <li>How to use AI headcanon generators effectively for inspiration</li>
+              <li>Creative headcanon ideas for anime, fanfiction, and original characters</li>
+              <li>Relationship headcanon development strategies</li>
+              <li>Tips for writing compelling character backstories</li>
+              <li>Advanced techniques for character psychology and motivation</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed">
+              Browse our articles above to find the perfect guide for your creative journey. Each post is designed to help you create more engaging, authentic, and memorable characters that resonate with your audience.
+            </p>
+          </section>
+        </div>
       </div>
     </div>
   )

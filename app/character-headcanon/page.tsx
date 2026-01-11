@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
 import { Toaster } from "@/components/ui/toaster"
+import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 
 const headcanonTypes = [
   "Random Selection",
@@ -314,6 +315,7 @@ export default function CharacterHeadcanonPage() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-24 md:pb-16">
+        <SEOBreadcrumb />
         {/* Hero Section */}
         <div className="mb-12 text-center">
           <div className="mb-6 flex items-center justify-center gap-3">
