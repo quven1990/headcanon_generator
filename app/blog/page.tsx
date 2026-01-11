@@ -6,9 +6,9 @@ import { format } from "date-fns"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 
 export const metadata: Metadata = {
-  title: "Headcanon Blog - AI Generator Guides & Tips | headcanonforge.com",
+  title: "Headcanon Blog - Guides & Tips | headcanonforge.com",
   description:
-    "Discover expert guides on character headcanon creation, AI generator tips, anime character development, and fanfiction writing. Learn how to build compelling character backstories with our comprehensive blog articles and start creating today.",
+    "Discover expert guides on character headcanon creation, AI generator tips, anime character development, and fanfiction writing. Learn how to build compelling character backstories.",
   robots: {
     index: true,
     follow: true,

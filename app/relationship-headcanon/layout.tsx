@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 
-// 1. Title 页面标签 - 50-60字符，关键词在开头，末尾加域名
+// 1. Title 页面标签 - 40-60字符，关键词在开头，末尾加域名
 export const metadata: Metadata = {
-  title: "Relationship Headcanon Generator AI | headcanonforge.com",
-  // 2. Description 页面描述 - 150-160字符，包含关键词和行动号召
+  title: "Relationship Headcanon Generator | headcanonforge.com",
+  // 2. Description 页面描述 - 140-160字符，包含关键词和行动号召
   description:
-    "Generate relationship headcanons for characters with our free AI tool. Explore friendships, romances, and rivalries. Perfect for fanfiction and creative writing. Create unique bonds today!",
+    "Generate relationship headcanons for characters with our free AI tool. Explore friendships, romances, and rivalries. Perfect for fanfiction and creative writing. Start creating today!",
   // 7. robots 元标签
   robots: {
     index: true,

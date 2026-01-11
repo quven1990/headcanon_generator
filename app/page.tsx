@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 import { HomePageContent } from "./home-page-content"
 
-// 1. Title 页面标签 - 50-60字符，关键词在开头，末尾加域名
+// 1. Title 页面标签 - 40-60字符，关键词在开头，末尾加域名
 export const metadata: Metadata = {
-  title: "Headcanon Generator - Free AI Tool | headcanonforge.com",
-  // 2. Description 页面描述 - 150-160字符，包含关键词和行动号召
+  title: "Free Headcanon Generator - AI Tool | headcanonforge.com",
+  // 2. Description 页面描述 - 140-160字符，包含关键词和行动号召
   description:
-    "Generate creative headcanon ideas for any character with our free AI-powered headcanon generator. Perfect for writers, fanfiction creators, and RPG players. Start creating unique character backstories today!",
+    "Generate creative headcanon ideas for any character with our free AI-powered headcanon generator. Perfect for writers, fanfiction creators, and RPG players. Start creating today!",
   // 7. robots 元标签
   robots: {
     index: true,
