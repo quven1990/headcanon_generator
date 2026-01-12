@@ -413,6 +413,7 @@ Generate the headcanon now:`
     }
 
     // 保存到数据库 - 使用 service_role key 绕过 RLS 策略
+    let recordId: number | null = null
     try {
       console.log("💾 正在保存数据到数据库...")
       
@@ -432,7 +433,7 @@ Generate the headcanon now:`
           }
         })
 
-        const { error: dbError } = await adminSupabase
+        const { data: insertedData, error: dbError } = await adminSupabase
           .from("headcanon_generations")
           .insert({
             user_id: userId,
@@ -444,6 +445,8 @@ Generate the headcanon now:`
             is_favorite: 0,
             is_deleted: 0,
           })
+          .select("id")
+          .single()
 
         if (dbError) {
           console.error("❌ 数据库保存失败:")
@@ -452,6 +455,10 @@ Generate the headcanon now:`
           // 不中断流程,继续返回生成的内容
         } else {
           console.log("✅ 数据已成功保存到数据库")
+          if (insertedData?.id) {
+            recordId = insertedData.id
+            console.log(`   记录 ID: ${recordId}`)
+          }
         }
       }
     } catch (saveError) {
@@ -463,7 +470,7 @@ Generate the headcanon now:`
     console.log("=".repeat(80))
     console.log(`[${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false })}] ✅ 请求处理完成\n`)
 
-    return Response.json({ headcanon })
+    return Response.json({ headcanon, recordId })
   } catch (error) {
     const totalDuration = Date.now() - startTime
     console.error("")

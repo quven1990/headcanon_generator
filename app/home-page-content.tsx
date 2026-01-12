@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Sparkles, Heart, ArrowRight, Clock } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { HeroGenerator } from "@/components/hero-generator"
 
 // 生成类型配置
 const generatorTypes = [
@@ -49,68 +50,36 @@ export function HomePageContent() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        {/* Header */}
-        <header className="mb-12 text-center">
-          <div className="mb-6 flex items-center justify-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent md:text-5xl">
-              Headcanon Generator
+        {/* Hero Section */}
+        <header className="mb-16 text-center">
+          <div className="max-w-4xl mx-auto px-4">
+            {/* Main Headline - Single Clear Value Proposition */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
+              Generate Creative Headcanons in Seconds
             </h1>
-          </div>
-          
-          {/* 明确的价值主张 - 3秒内让用户明白 */}
-          <div className="mb-10 max-w-3xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-              Create Unique Character Stories with AI
-            </h2>
-            <p className="text-base md:text-lg lg:text-xl text-gray-700 mb-4 leading-relaxed">
-              Generate creative backstories, personality traits, and relationship dynamics for any character from any fandom. Perfect for fanfiction, role-playing games, and creative writing.
-            </p>
-            <p className="text-sm md:text-base text-gray-600 mb-8">
-              <span className="font-semibold text-green-600">Free to Use</span> • No sign-up required to explore • Instant results
+            
+            {/* Short Subheadline - How Easy It Is */}
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8">
+              Just enter a character name and get instant AI-generated stories
             </p>
             
-            {/* 主要CTA按钮 - 醒目且响应式 */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="w-full sm:w-auto sm:flex-1 max-w-xs sm:max-w-none px-6 sm:px-8 py-5 sm:py-6 text-base md:text-lg font-bold bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl rounded-xl transition-all duration-200 transform hover:scale-105"
-              >
-                <Link href="/character-headcanon">
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Start Creating Free
-                </Link>
-              </Button>
+            {/* Interactive Generator */}
+            <div className="mb-6">
+              <HeroGenerator />
+            </div>
+            
+            {/* Secondary CTA */}
+            <div className="flex justify-center">
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto sm:flex-1 max-w-xs sm:max-w-none px-6 sm:px-8 py-5 sm:py-6 text-base md:text-lg font-semibold border-2 border-purple-300 text-purple-600 hover:bg-purple-50 hover:border-purple-400 rounded-xl transition-all duration-200"
+                className="px-6 py-3 text-base font-semibold border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl transition-all duration-200"
               >
-                <Link href="/relationship-headcanon">
-                  <Heart className="mr-2 h-5 w-5" />
-                  Try Relationship
+                <Link href="/character-headcanon">
+                  See an Example
                 </Link>
               </Button>
-            </div>
-          </div>
-          
-          {/* 快速说明 - 增强信任感 */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-600 mb-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span className="font-medium text-green-700">Free to Use</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
-              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-              <span className="font-medium text-blue-700">No Credit Card</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
-              <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-              <span className="font-medium text-purple-700">Instant Results</span>
             </div>
           </div>
         </header>

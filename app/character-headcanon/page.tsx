@@ -101,6 +101,7 @@ export default function CharacterHeadcanonPage() {
   const [totalTime, setTotalTime] = useState<number>(0)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [pendingGenerate, setPendingGenerate] = useState(false)
+  const [autoGenerateFlag, setAutoGenerateFlag] = useState(false)
 
   const handleExampleClick = (example: typeof examples[0]) => {
     setCharacterName(example.name)
@@ -160,20 +161,51 @@ export default function CharacterHeadcanonPage() {
     }
   }
 
-  // 监听登录状态，如果登录成功且有待处理的生成请求，则继续生成
+  // 从 URL 参数读取字符名称和自动生成标志
   useEffect(() => {
-    // 检查 URL 中是否有 pendingGenerate 参数（从回调返回时）
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !authLoading) {
       const urlParams = new URLSearchParams(window.location.search)
+      const characterParam = urlParams.get('character')
+      const autoGenerate = urlParams.get('autoGenerate') === 'true'
       const shouldGenerate = urlParams.get('pendingGenerate') === 'true'
-      if (shouldGenerate) {
-        // 清除 URL 参数
+      
+      // 如果有字符参数，预填表单
+      if (characterParam && !characterName) {
+        setCharacterName(decodeURIComponent(characterParam))
+      }
+      
+      // 设置自动生成标志
+      if (autoGenerate && characterParam) {
+        setAutoGenerateFlag(true)
+      }
+      
+      // 清除 URL 参数（保持干净的 URL）
+      if (characterParam || autoGenerate || shouldGenerate) {
         const newUrl = window.location.pathname
         window.history.replaceState({}, '', newUrl)
+      }
+      
+      if (shouldGenerate) {
         setPendingGenerate(true)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading])
 
+  // 自动生成：当字符名称设置完成且用户已登录时触发
+  useEffect(() => {
+    if (autoGenerateFlag && characterName && isAuthenticated && !authLoading) {
+      setAutoGenerateFlag(false)
+      // 延迟一下确保状态更新完成
+      setTimeout(() => {
+        handleGenerate()
+      }, 500)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoGenerateFlag, characterName, isAuthenticated, authLoading])
+
+  // 监听登录状态，如果登录成功且有待处理的生成请求，则继续生成
+  useEffect(() => {
     if (isAuthenticated && pendingGenerate && !authLoading) {
       setPendingGenerate(false)
       setShowLoginDialog(false)
@@ -260,6 +292,19 @@ export default function CharacterHeadcanonPage() {
 
       const data = await response.json()
 
+      // 清除所有定时器
+      if (timeoutId) clearTimeout(timeoutId)
+      if (countdownInterval) clearInterval(countdownInterval)
+      setCountdown(null)
+      setIsLoadingSection(null)
+
+      // 如果 API 返回了记录 ID，跳转到详情页
+      if (data.recordId) {
+        router.push(`/explore/${data.recordId}`)
+        return
+      }
+
+      // 如果没有记录 ID，则显示在页面上（向后兼容）
       // 解析生成的内容
       const parsed = parseHeadcanon(data.headcanon)
 
@@ -293,8 +338,6 @@ export default function CharacterHeadcanonPage() {
       await new Promise(resolve => setTimeout(resolve, 500))
 
       setIsLoadingSection(null)
-      if (countdownInterval) clearInterval(countdownInterval) // Stop countdown on success
-      setCountdown(null)
     } catch (error) {
       // 清除超时定时器
       if (timeoutId) clearTimeout(timeoutId)
