@@ -1,9 +1,12 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Heart, ArrowRight, Clock } from "lucide-react"
+import { Sparkles, Heart, ArrowRight, Clock, Type, Zap, FileText } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { HeroGenerator } from "@/components/hero-generator"
+import { GeneratorCardButton } from "@/components/generator-card-button"
 
 // 生成类型配置
 const generatorTypes = [
@@ -45,13 +48,13 @@ const generatorTypes = [
   },
 ]
 
-// 服务端组件 - 包含所有静态内容和 SEO 内容
+// 客户端组件 - 包含所有静态内容和 SEO 内容（使用客户端组件以支持登录检查）
 export function HomePageContent() {
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+      <div className="mx-auto max-w-7xl px-6 py-8 md:py-12">
         {/* Hero Section */}
-        <header className="mb-16 text-center">
+        <header className="mb-12 text-center">
           <div className="max-w-4xl mx-auto px-4">
             {/* Main Headline - Single Clear Value Proposition */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
@@ -83,6 +86,111 @@ export function HomePageContent() {
             </div>
           </div>
         </header>
+
+        {/* Example Output Section */}
+        <section className="mb-12 max-w-4xl mx-auto px-4">
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-100 p-5 md:p-6 shadow-sm">
+            <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">Example Output</h2>
+              <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-blue-200">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-sm font-medium text-gray-700">Harry Potter</span>
+              </div>
+            </div>
+            <p className="text-gray-600 mb-4 text-sm">
+              See what a generated headcanon looks like
+            </p>
+            
+            <div className="space-y-3">
+              {/* Core Idea */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                  <h3 className="font-semibold text-gray-900 text-sm">Core Idea</h3>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  Harry has a secret habit of collecting small, ordinary objects that remind him of happy moments before the war—a smooth pebble from the Black Lake, a broken quill from his first day at Hogwarts, a button from one of Mrs. Weasley's sweaters. These items sit in a small box under his bed, each one a tiny anchor to a time when things were simpler.
+                </p>
+              </div>
+
+              {/* Development */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                  <h3 className="font-semibold text-gray-900 text-sm">Development</h3>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  This habit started unconsciously during his sixth year, when the weight of responsibility began to press down. After the war, it became more intentional—a way to remind himself that not everything had been lost, that there were still moments of light worth holding onto. Ginny knows about the box but has never mentioned it, understanding that some things are too precious to be spoken about aloud.
+                </p>
+              </div>
+
+              {/* Moment */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
+                  <h3 className="font-semibold text-gray-900 text-sm">Moment</h3>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  One quiet evening, James finds the box while looking for a missing toy. Instead of scolding, Harry sits with him on the floor, pulling out each item one by one and telling the stories behind them—the pebble from the first time he rode a broomstick, the quill from his first successful potion, the button from the Christmas he felt truly at home. James's eyes light up with each story, and Harry realizes he's not just holding onto memories—he's creating new ones to share.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How it Works Section */}
+        <section className="mb-16 max-w-5xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">How it Works</h2>
+            <p className="text-gray-600 text-base">
+              Get creative headcanons in three simple steps
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4 shadow-lg">
+                <Type className="h-8 w-8 text-white" />
+              </div>
+              <div className="mb-2">
+                <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Step 1</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Enter Character Name</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Type the name of any character you want to explore. No complex setup needed.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg">
+                <Zap className="h-8 w-8 text-white" />
+              </div>
+              <div className="mb-2">
+                <span className="text-sm font-semibold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">Step 2</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Generates Story</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Our AI creates a unique headcanon with creative ideas, development, and moments.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-4 shadow-lg">
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div className="mb-2">
+                <span className="text-sm font-semibold text-pink-600 bg-pink-50 px-3 py-1 rounded-full">Step 3</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Get Your Result</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Receive your complete headcanon story ready to use for writing or inspiration.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Generator Types Grid */}
         <div className="mb-8">
@@ -145,25 +253,21 @@ export function HomePageContent() {
                   </div>
                   
                   {/* CTA Button - 更醒目 */}
-                  <Button
-                    asChild
+                  <GeneratorCardButton
+                    typeId={type.id}
                     className={cn(
-                      "w-full justify-center group/btn rounded-xl font-semibold text-sm md:text-base py-6 shadow-sm hover:shadow-md transition-all duration-200",
                       type.id === "character-headcanon"
                         ? "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
                         : "bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white"
                     )}
                   >
-                    <Link href={`/${type.id}`}>
-                      <span>
-                        {type.id === "character-name" ? "Generate Names" : 
-                         type.id === "relationship-headcanon" ? "Generate Relationship" :
-                         type.id === "scenario-headcanon" ? "Explore Scenarios" :
-                         "Start Creating"}
-                      </span>
-                      <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover/btn:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
+                    <span>
+                      {type.id === "character-name" ? "Generate Names" : 
+                       type.id === "relationship-headcanon" ? "Generate Relationship" :
+                       type.id === "scenario-headcanon" ? "Explore Scenarios" :
+                       "Start Creating"}
+                    </span>
+                  </GeneratorCardButton>
                 </CardContent>
               </Card>
             )

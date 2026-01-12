@@ -23,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Heart, Sparkles, Rocket, Lightbulb, RefreshCw, Plus, X, LogIn, Lock } from "lucide-react"
+import { Heart, Sparkles, Rocket, Lightbulb, RefreshCw, Plus, X, LogIn, Lock, Copy, Check } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -106,6 +106,7 @@ export default function RelationshipHeadcanonPage() {
   const [countdown, setCountdown] = useState<number | null>(null)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [pendingGenerate, setPendingGenerate] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleAddCharacter = () => {
     if (characters.length < 5) {
@@ -129,6 +130,43 @@ export default function RelationshipHeadcanonPage() {
     const newChars = [...characters]
     newChars[index] = value
     setCharacters(newChars)
+  }
+
+  const handleCopyResult = async () => {
+    if (!generatedHeadcanon) return
+
+    // 构建完整的headcanon文本
+    const fullText = [
+      `Characters: ${generatedHeadcanon.characters.join(" & ")}`,
+      generatedHeadcanon.fandom ? `Fandom: ${generatedHeadcanon.fandom}` : '',
+      generatedHeadcanon.type ? `Type: ${generatedHeadcanon.type}` : '',
+      generatedHeadcanon.tone ? `Tone: ${generatedHeadcanon.tone}` : '',
+      '',
+      'Core Idea:',
+      generatedHeadcanon.coreIdea,
+      '',
+      'Development:',
+      generatedHeadcanon.development,
+      '',
+      'Moment:',
+      generatedHeadcanon.moment,
+    ].filter(Boolean).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(fullText)
+      setCopied(true)
+      toast({
+        title: "Copied!",
+        description: "Headcanon copied to clipboard",
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Please try again",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleExampleClick = (example: typeof examples[0]) => {
@@ -929,15 +967,38 @@ export default function RelationshipHeadcanonPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 pt-3 md:pt-4 border-t border-gray-100">
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full h-10 text-sm font-medium bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
-                  >
-                    <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                    Regenerate
-                  </Button>
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 pt-3 md:pt-4 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      onClick={handleCopyResult}
+                      disabled={isLoadingSection !== null}
+                      className="flex-1 h-10 text-sm font-medium bg-white border-2 border-gray-300 hover:border-pink-500 hover:bg-pink-50 text-gray-700 hover:text-pink-700 rounded-xl shadow-sm hover:shadow transition-all duration-200"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy Result
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      className="flex-1 h-10 text-sm font-medium bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                    >
+                      <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
+                      Regenerate
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 text-center">
+                    💡 Tip: Copy your result to share or save for later
+                  </p>
                 </div>
               </Card>
             )}

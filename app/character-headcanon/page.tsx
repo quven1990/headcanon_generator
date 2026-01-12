@@ -23,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Sparkles, Target, Rocket, Lightbulb, RefreshCw, LogIn, Lock } from "lucide-react"
+import { Sparkles, Target, Rocket, Lightbulb, RefreshCw, LogIn, Lock, Copy, Check } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -102,6 +102,7 @@ export default function CharacterHeadcanonPage() {
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [pendingGenerate, setPendingGenerate] = useState(false)
   const [autoGenerateFlag, setAutoGenerateFlag] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleExampleClick = (example: typeof examples[0]) => {
     setCharacterName(example.name)
@@ -109,6 +110,42 @@ export default function CharacterHeadcanonPage() {
     setHeadcanonType(example.type)
     setTone(example.tone)
     setContext("")
+  }
+
+  const handleCopyResult = async () => {
+    if (!generatedHeadcanon) return
+
+    // 构建完整的headcanon文本
+    const fullText = [
+      `Character: ${generatedHeadcanon.character}`,
+      generatedHeadcanon.fandom ? `Fandom: ${generatedHeadcanon.fandom}` : '',
+      generatedHeadcanon.tone ? `Tone: ${generatedHeadcanon.tone}` : '',
+      '',
+      'Core Idea:',
+      generatedHeadcanon.coreIdea,
+      '',
+      'Development:',
+      generatedHeadcanon.development,
+      '',
+      'Moment:',
+      generatedHeadcanon.moment,
+    ].filter(Boolean).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(fullText)
+      setCopied(true)
+      toast({
+        title: "Copied!",
+        description: "Headcanon copied to clipboard",
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Please try again",
+        variant: "destructive",
+      })
+    }
   }
 
   const parseHeadcanon = (text: string) => {
@@ -298,14 +335,7 @@ export default function CharacterHeadcanonPage() {
       setCountdown(null)
       setIsLoadingSection(null)
 
-      // 如果 API 返回了记录 ID，跳转到详情页
-      if (data.recordId) {
-        router.push(`/explore/${data.recordId}`)
-        return
-      }
-
-      // 如果没有记录 ID，则显示在页面上（向后兼容）
-      // 解析生成的内容
+      // 解析生成的内容，在当前页面显示结果
       const parsed = parseHeadcanon(data.headcanon)
 
       // 动态加载效果 - 逐步显示内容
@@ -884,15 +914,37 @@ export default function CharacterHeadcanonPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-3 pt-3 md:pt-4 border-t border-gray-100">
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full h-10 text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl shadow-sm hover:shadow transition-all duration-200"
-                  >
-                    <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                    Regenerate
-                  </Button>
+                <div className="flex flex-col gap-3 pt-3 md:pt-4 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      onClick={handleCopyResult}
+                      disabled={isLoadingSection !== null}
+                      className="flex-1 h-10 text-sm font-medium bg-white border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 hover:text-blue-700 rounded-xl shadow-sm hover:shadow transition-all duration-200"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy Result
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      className="flex-1 h-10 text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl shadow-sm hover:shadow transition-all duration-200"
+                    >
+                      <RefreshCw className="mr-2 h-3 w-3 md:h-4 md:w-4" />
+                      Regenerate
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 text-center">
+                    💡 Tip: Copy your result to share or save for later
+                  </p>
                 </div>
               </Card>
             )}
