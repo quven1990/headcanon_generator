@@ -1,6 +1,25 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
+/**
+ * 获取认证回调 URL
+ * 根据请求 URL 动态决定回调地址
+ * 参考: https://supabase.com/docs/guides/auth/redirect-urls
+ * 
+ * 工作原理:
+ * - 本地开发: requestUrl.origin = "http://localhost:3000" → 使用本地地址
+ * - 生产环境: requestUrl.origin = "https://www.headcanonforge.com" → 使用生产地址
+ * 
+ * 注意: 这些 URL 都必须在 Supabase 的 Redirect URLs 中配置
+ */
+function getAuthCallbackUrl(requestUrl: URL, next: string): string {
+  // 直接使用请求的 origin，因为它会自动匹配当前环境
+  // - 本地开发: localhost:3000
+  // - 生产环境: 生产域名
+  const baseUrl = requestUrl.origin.replace(/\/$/, '') // 移除末尾斜杠
+  return `${baseUrl}/auth/callback?next=${encodeURIComponent(next)}`
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const next = requestUrl.searchParams.get('next') || '/'
@@ -53,13 +72,16 @@ export async function GET(request: NextRequest) {
   )
 
   try {
+    // 获取回调 URL（根据环境动态决定）
+    const redirectTo = getAuthCallbackUrl(requestUrl, next)
+    
     console.log('Starting OAuth flow with Supabase...')
-    console.log('Redirect URL:', `${requestUrl.origin}/auth/callback`)
+    console.log('Redirect URL:', redirectTo)
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${requestUrl.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: redirectTo,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

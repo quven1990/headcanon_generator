@@ -17,6 +17,12 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
+    let response = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    })
+
     const supabase = createServerClient(
       supabaseUrl,
       supabaseAnonKey,
@@ -26,8 +32,10 @@ export async function GET(request: NextRequest) {
             return request.cookies.getAll()
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-            // 注意：这里不能直接修改 response，需要在 exchangeCodeForSession 之后创建
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value)
+              response.cookies.set(name, value, options)
+            })
           },
         },
       }
@@ -45,7 +53,20 @@ export async function GET(request: NextRequest) {
     // 登录成功，在重定向 URL 中添加 loginSuccess 参数
     const redirectUrl = new URL(next, requestUrl.origin)
     redirectUrl.searchParams.set('loginSuccess', 'true')
-    return NextResponse.redirect(redirectUrl)
+    
+    // 创建重定向响应，并携带所有 cookies
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, {
+        httpOnly: cookie.httpOnly,
+        secure: cookie.secure,
+        sameSite: cookie.sameSite as any,
+        path: cookie.path,
+        maxAge: cookie.expires ? undefined : 60 * 60 * 24 * 365, // 1 year default
+      })
+    })
+    
+    return redirectResponse
   }
 
   // 如果没有 code，直接重定向

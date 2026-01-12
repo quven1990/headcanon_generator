@@ -77,6 +77,21 @@ export function GoogleLoginButton() {
       const urlParams = new URLSearchParams(window.location.search)
       const loginSuccess = urlParams.get('loginSuccess')
       if (loginSuccess === 'true') {
+        // 重新获取用户状态（因为刚刚登录成功）
+        const refreshUser = async () => {
+          try {
+            const supabase = createClient()
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session?.user) {
+              setUser(session.user)
+              setLoading(false)
+            }
+          } catch (error) {
+            console.error('Error refreshing user after login:', error)
+          }
+        }
+        refreshUser()
+        
         // 显示登录成功提示
         toast({
           title: "Login Successful",
