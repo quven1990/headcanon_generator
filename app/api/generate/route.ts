@@ -1,5 +1,76 @@
 import { createServerClient } from "@supabase/ssr"
+import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
+
+// 解析headcanon文本,提取core_idea, development, moment
+function parseHeadcanon(text: string) {
+  let cleanText = text.trim()
+  
+  // 尝试解析结构化的内容（带标签）
+  const coreIdeaMatch = cleanText.match(/(?:Core Idea|core idea|CoreIdea|Brainstorm|brainstorm):\s*(.+?)(?=\n\n*(?:Development|development|Elaboration|elaboration|Moment|moment|Scene|scene):|$)/is)
+  const developmentMatch = cleanText.match(/(?:Development|development|Elaboration|elaboration):\s*(.+?)(?=\n\n*(?:Moment|moment|Scene|scene):|$)/is)
+  const momentMatch = cleanText.match(/(?:Moment|moment|Scene|scene):\s*(.+?)$/is)
+
+  let coreIdea = ""
+  let development = ""
+  let moment = ""
+
+  if (coreIdeaMatch && developmentMatch && momentMatch) {
+    coreIdea = coreIdeaMatch[1].trim().replace(/^["']|["']$/g, "")
+    development = developmentMatch[1].trim().replace(/^["']|["']$/g, "")
+    moment = momentMatch[1].trim().replace(/^["']|["']$/g, "")
+  } else {
+    // 如果没有找到结构化格式，尝试按段落分割
+    const paragraphs = cleanText.split(/\n\n+/).filter(p => p.trim())
+    if (paragraphs.length >= 3) {
+      coreIdea = paragraphs[0].trim()
+      development = paragraphs[1].trim()
+      moment = paragraphs.slice(2).join(" ").trim()
+    } else if (paragraphs.length === 2) {
+      coreIdea = paragraphs[0].trim()
+      development = paragraphs[1].trim()
+      moment = ""
+    } else if (paragraphs.length === 1) {
+      // 如果只有一个段落，尝试按句子分割
+      const sentences = paragraphs[0].split(/[.!?]+/).filter(s => s.trim())
+      const third = Math.ceil(sentences.length / 3)
+      coreIdea = sentences.slice(0, third).join(". ").trim() + (sentences.slice(0, third).length > 0 ? "." : "")
+      development = sentences.slice(third, third * 2).join(". ").trim() + (sentences.slice(third, third * 2).length > 0 ? "." : "")
+      moment = sentences.slice(third * 2).join(". ").trim() + (sentences.slice(third * 2).length > 0 ? "." : "")
+    } else {
+      // 最后的回退：按字符数分割
+      coreIdea = cleanText.substring(0, Math.min(150, cleanText.length))
+      development = cleanText.substring(150, Math.min(400, cleanText.length))
+      moment = cleanText.substring(400)
+    }
+  }
+
+  return {
+    coreIdea: coreIdea || "No core idea generated.",
+    development: development || "No development generated.",
+    moment: moment || "No moment generated."
+  }
+}
+
+// 将UUID字符串转换为bigint (使用hash算法)
+function uuidToBigInt(uuid: string): number {
+  try {
+    // 移除UUID中的连字符
+    const cleanUuid = uuid.replace(/-/g, '')
+    // 使用简单的hash算法: 将UUID的前部分转换为数字
+    let hash = 0
+    for (let i = 0; i < Math.min(15, cleanUuid.length); i++) {
+      const char = cleanUuid.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // 转换为32位整数
+    }
+    // 确保结果是正数
+    return Math.abs(hash) % Number.MAX_SAFE_INTEGER
+  } catch (error) {
+    console.warn("UUID转换失败,使用默认值0:", error)
+    return 0
+  }
+}
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now()
@@ -261,6 +332,134 @@ Generate the headcanon now:`
     console.log("-".repeat(80))
     console.log(headcanon.substring(0, 200) + (headcanon.length > 200 ? "..." : ""))
     console.log("-".repeat(80))
+
+    // 解析生成的内容
+    const parsed = parseHeadcanon(headcanon)
+    const { coreIdea, development, moment } = parsed
+
+    // 构建input_data JSON对象
+    let inputData: any = {}
+    const generationType = isRelationshipType ? "relationship" : "character"
+    
+    if (isRelationshipType) {
+      // 关系类型: characterInput格式为 "Char1 and Char2 from Fandom. Context"
+      let remainingInput = characterInput
+      let context = ""
+      
+      // 提取context (在最后一个"."之后的内容)
+      const lastDotIndex = remainingInput.lastIndexOf(".")
+      if (lastDotIndex > 0 && lastDotIndex < remainingInput.length - 1) {
+        context = remainingInput.substring(lastDotIndex + 1).trim()
+        remainingInput = remainingInput.substring(0, lastDotIndex)
+      }
+      
+      // 提取fandom (在" from "之后的内容)
+      let fandom = ""
+      const fromIndex = remainingInput.toLowerCase().lastIndexOf(" from ")
+      if (fromIndex > 0) {
+        fandom = remainingInput.substring(fromIndex + 6).trim()
+        remainingInput = remainingInput.substring(0, fromIndex)
+      }
+      
+      // 提取characters (剩余部分,用"and"或"&"分割)
+      const characters = remainingInput.split(/\s+(?:and|&)\s+/i).map(c => c.trim()).filter(c => c)
+      
+      inputData = {
+        characters: characters.length > 0 ? characters : [characterInput],
+        fandom: fandom,
+        relationshipType: headcanonType || "Relationship",
+        tone: focusArea || "",
+        length: length || "Medium",
+        ...(context ? { context: context } : {}),
+      }
+    } else {
+      // 角色类型: characterInput格式为 "CharacterName from Fandom. Context"
+      let remainingInput = characterInput
+      let context = ""
+      
+      // 提取context (在最后一个"."之后的内容)
+      const lastDotIndex = remainingInput.lastIndexOf(".")
+      if (lastDotIndex > 0 && lastDotIndex < remainingInput.length - 1) {
+        context = remainingInput.substring(lastDotIndex + 1).trim()
+        remainingInput = remainingInput.substring(0, lastDotIndex)
+      }
+      
+      // 提取characterName和fandom
+      const fromIndex = remainingInput.toLowerCase().indexOf(" from ")
+      let characterName = remainingInput
+      let fandom = ""
+      if (fromIndex > 0) {
+        characterName = remainingInput.substring(0, fromIndex).trim()
+        fandom = remainingInput.substring(fromIndex + 6).trim()
+      }
+      
+      inputData = {
+        characterName: characterName,
+        fandom: fandom,
+        headcanonType: headcanonType || "",
+        tone: focusArea || "",
+        length: length || "Medium",
+        ...(context ? { context: context } : {}),
+      }
+    }
+
+    // 转换user_id: UUID字符串转bigint
+    let userId = 0
+    try {
+      userId = uuidToBigInt(user.id)
+    } catch (error) {
+      console.warn("⚠️  无法转换user_id,使用默认值0:", error)
+      userId = 0
+    }
+
+    // 保存到数据库 - 使用 service_role key 绕过 RLS 策略
+    try {
+      console.log("💾 正在保存数据到数据库...")
+      
+      // 使用 service_role key 创建管理员客户端（绕过 RLS）
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
+      
+      if (!serviceRoleKey) {
+        console.warn("⚠️  SUPABASE_SERVICE_ROLE_KEY 未配置,跳过数据库保存")
+        console.warn("   如需保存数据,请在 .env.local 中添加 SUPABASE_SERVICE_ROLE_KEY")
+        console.warn("   获取方式: Supabase Dashboard -> Project Settings -> API -> service_role key")
+      } else {
+        // 使用 @supabase/supabase-js 创建管理员客户端（绕过 RLS）
+        const adminSupabase = createClient(supabaseUrl, serviceRoleKey, {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        })
+
+        const { error: dbError } = await adminSupabase
+          .from("headcanon_generations")
+          .insert({
+            user_id: userId,
+            type: generationType,
+            input_data: inputData,
+            core_idea: coreIdea,
+            development: development,
+            moment: moment,
+            is_favorite: 0,
+            is_deleted: 0,
+          })
+
+        if (dbError) {
+          console.error("❌ 数据库保存失败:")
+          console.error(`   错误信息: ${dbError.message}`)
+          console.error(`   错误详情: ${JSON.stringify(dbError)}`)
+          // 不中断流程,继续返回生成的内容
+        } else {
+          console.log("✅ 数据已成功保存到数据库")
+        }
+      }
+    } catch (saveError) {
+      console.error("❌ 保存数据时发生异常:")
+      console.error(`   错误信息: ${saveError instanceof Error ? saveError.message : String(saveError)}`)
+      // 不中断流程,继续返回生成的内容
+    }
+
     console.log("=".repeat(80))
     console.log(`[${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false })}] ✅ 请求处理完成\n`)
 

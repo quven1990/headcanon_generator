@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Sparkles, Heart, Home, BookOpen } from "lucide-react"
+import { Sparkles, Heart, Home, BookOpen, Compass } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { GoogleLoginButtonLazy } from "@/components/google-login-button-lazy"
 import { Toaster } from "@/components/ui/toaster"
@@ -25,6 +25,12 @@ const navigation = [
     href: "/relationship-headcanon",
     icon: Heart,
     description: "Generate relationship headcanons",
+  },
+  {
+    name: "Explore",
+    href: "/explore",
+    icon: Compass,
+    description: "Explore your generations",
   },
   {
     name: "Blog",
