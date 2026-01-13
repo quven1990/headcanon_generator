@@ -1,13 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Calendar } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useAuth } from "@/hooks/use-auth"
 
 interface GenerationRecord {
   id: number
@@ -33,8 +31,6 @@ interface GenerationRecord {
 
 export default function ExploreDetailPage() {
   const params = useParams()
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
   const [record, setRecord] = useState<GenerationRecord | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,10 +43,6 @@ export default function ExploreDetailPage() {
         const response = await fetch(`/api/explore/${id}`)
         
         if (!response.ok) {
-          if (response.status === 401) {
-            setError("Please sign in to view this generation")
-            return
-          }
           if (response.status === 404) {
             setError("Generation not found")
             return
@@ -68,10 +60,10 @@ export default function ExploreDetailPage() {
       }
     }
 
-    if (!authLoading && id) {
+    if (id) {
       fetchRecord()
     }
-  }, [id, authLoading])
+  }, [id])
 
   const getTitle = (record: GenerationRecord): string => {
     if (record.type === "relationship" && record.input_data.characters) {
@@ -102,7 +94,7 @@ export default function ExploreDetailPage() {
     return tags
   }
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16 lg:py-20">
@@ -187,27 +179,6 @@ export default function ExploreDetailPage() {
                 {relativeTime}
               </time>
             </div>
-            {user && (
-              <div className="flex items-center gap-2">
-                <Avatar className="w-5 h-5">
-                  {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
-                    <AvatarImage
-                      src={user.user_metadata.avatar_url || user.user_metadata.picture}
-                      alt={`${user.user_metadata?.full_name || user.user_metadata?.name || "User"} avatar profile picture`}
-                    />
-                  ) : null}
-                  <AvatarFallback className="bg-purple-100 text-purple-700 text-[10px] font-medium">
-                    {(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'A')
-                      .split(' ')
-                      .map((n: string) => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <span>{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || "User"}</span>
-              </div>
-            )}
           </div>
 
           {/* Input Parameters */}

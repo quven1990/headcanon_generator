@@ -4,8 +4,6 @@ import { useEffect, useState } from "react"
 import { formatDistanceToNow } from "date-fns"
 import { Compass, User } from "lucide-react"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useAuth } from "@/hooks/use-auth"
 import Link from "next/link"
 import {
   Pagination,
@@ -40,7 +38,6 @@ interface GenerationRecord {
 }
 
 function ExploreContent() {
-  const { user, loading: authLoading } = useAuth()
   const [records, setRecords] = useState<GenerationRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -61,10 +58,6 @@ function ExploreContent() {
         const response = await fetch(`/api/explore?page=${currentPage}&limit=12`)
         
         if (!response.ok) {
-          if (response.status === 401) {
-            setError("Please sign in to view your generations")
-            return
-          }
           throw new Error("Failed to fetch records")
         }
 
@@ -79,10 +72,8 @@ function ExploreContent() {
       }
     }
 
-    if (!authLoading) {
-      fetchRecords()
-    }
-  }, [authLoading, currentPage])
+    fetchRecords()
+  }, [currentPage])
 
   const getTitle = (record: GenerationRecord): string => {
     if (record.type === "relationship" && record.input_data.characters) {
@@ -128,13 +119,13 @@ function ExploreContent() {
     return cleanText
   }
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-500">Loading your generations...</p>
+            <p className="mt-4 text-gray-500">Loading generations...</p>
           </div>
         </div>
       </div>
@@ -145,38 +136,9 @@ function ExploreContent() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
-          <div className="text-center py-12">
-            <p className="text-red-600 mb-4">{error}</p>
-            {!user && (
-              <Link
-                href="/api/auth/login"
-                rel="noopener noreferrer nofollow"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
           <SEOBreadcrumb />
           <div className="text-center py-12">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Sign In Required</h1>
-            <p className="text-gray-600 mb-8">Please sign in to view your generations</p>
-            <Link
-              href="/api/auth/login"
-              rel="noopener noreferrer nofollow"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all shadow-md"
-            >
-              Sign In with Google
-            </Link>
+            <p className="text-red-600 mb-4">{error}</p>
           </div>
         </div>
       </div>
@@ -192,11 +154,11 @@ function ExploreContent() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-4">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Explore Your Generations
+              Explore Generations
             </span>
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Browse through your AI-generated headcanons
+            Browse through AI-generated headcanons from the community
           </p>
         </div>
 
@@ -254,22 +216,7 @@ function ExploreContent() {
                     {/* Metadata */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Avatar className="w-5 h-5">
-                          {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
-                            <AvatarImage
-                              src={user.user_metadata.avatar_url || user.user_metadata.picture}
-                              alt={`${user.user_metadata?.full_name || user.user_metadata?.name || "User"} avatar profile picture`}
-                            />
-                          ) : null}
-                          <AvatarFallback className="bg-purple-100 text-purple-700 text-[10px] font-medium">
-                            {(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'A')
-                              .split(' ')
-                              .map((n: string) => n[0])
-                              .join('')
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <User className="w-4 h-4" />
                         <span>{relativeTime}</span>
                       </div>
                       <Link

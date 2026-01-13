@@ -1,4 +1,3 @@
-import { createServerClient } from "@supabase/ssr"
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -19,47 +18,7 @@ export async function GET(
       )
     }
 
-    // 创建客户端用于验证用户
-    let supabaseResponse = NextResponse.next({
-      request: {
-        headers: req.headers,
-      },
-    })
-
-    const supabase = createServerClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          getAll() {
-            return req.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => req.cookies.set(name, value))
-            supabaseResponse = NextResponse.next({
-              request: {
-                headers: req.headers,
-              },
-            })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
-    // 验证用户身份
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      )
-    }
-
-    // 使用 service_role key 查询数据
+    // 使用 service_role key 查询数据（无需登录，显示所有人的记录）
     if (!serviceRoleKey) {
       return NextResponse.json(
         { error: "Server configuration error: service_role key not found" },
@@ -74,25 +33,7 @@ export async function GET(
       }
     })
 
-    // 转换 user_id: UUID字符串转bigint
-    function uuidToBigInt(uuid: string): number {
-      try {
-        const cleanUuid = uuid.replace(/-/g, '')
-        let hash = 0
-        for (let i = 0; i < Math.min(15, cleanUuid.length); i++) {
-          const char = cleanUuid.charCodeAt(i)
-          hash = ((hash << 5) - hash) + char
-          hash = hash & hash
-        }
-        return Math.abs(hash) % Number.MAX_SAFE_INTEGER
-      } catch (error) {
-        return 0
-      }
-    }
-
-    const userId = uuidToBigInt(user.id)
-
-    // 查询指定的生成记录
+    // 查询指定的生成记录（所有用户的记录）
     const recordId = parseInt(id, 10)
     if (isNaN(recordId)) {
       return NextResponse.json(
@@ -105,7 +46,6 @@ export async function GET(
       .from("headcanon_generations")
       .select("*")
       .eq("id", recordId)
-      .eq("user_id", userId)
       .eq("is_deleted", 0)
       .single()
 

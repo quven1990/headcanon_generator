@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
     '/',
     '/character-headcanon',
     '/relationship-headcanon',
+    '/explore',
   ]
 
   // 检查是否是公共页面
