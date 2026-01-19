@@ -2,6 +2,78 @@ import { createServerClient } from "@supabase/ssr"
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 
+// 内容过滤函数：检测不适当、违法或不当内容
+function containsInappropriateContent(text: string): boolean {
+  if (!text || typeof text !== 'string') {
+    return false
+  }
+
+  const lowerText = text.toLowerCase()
+  
+  // 性相关内容关键词（包括用户示例中的词汇）
+  const sexualKeywords = [
+    'penis', 'dick', 'cock', 'dick', 'phallus', 'genital',
+    'vagina', 'pussy', 'cunt', 'clitoris',
+    'balls', 'testicles', 'scrotum',
+    'sex', 'sexual', 'intercourse', 'fuck', 'fucking', 'fucked',
+    'orgasm', 'masturbat', 'ejaculat', 'cum', 'sperm',
+    'erotic', 'erotica', 'porn', 'pornographic', 'xxx',
+    'nude', 'naked', 'nudity', 'bare', 'exposed',
+    'gigantic penis', 'huge penis', 'big penis', 'large penis',
+    'thick penis', 'veiny', 'heavy balls', 'big balls',
+    'hard-on', 'erection', 'aroused', 'horny',
+    'breast', 'boob', 'nipple', 'tits',
+    'ass', 'butt', 'buttock', 'anus', 'anal',
+    'oral', 'blowjob', 'cunnilingus', 'fellatio',
+    'kink', 'fetish', 'bdsm', 'bondage', 'sadomasochism',
+    'rape', 'raping', 'molest', 'abuse',
+    'incest', 'pedophil', 'underage',
+  ]
+
+  // 暴力/违法内容关键词
+  const violentKeywords = [
+    'kill', 'murder', 'assassinat', 'homicide',
+    'torture', 'torturing', 'tortured',
+    'suicide', 'self-harm', 'cutting',
+    'terrorism', 'bomb', 'explosive', 'weapon',
+    'drug', 'cocaine', 'heroin', 'meth', 'marijuana',
+    'illegal', 'crime', 'criminal',
+  ]
+
+  // 仇恨/歧视内容关键词
+  const hateKeywords = [
+    'nazi', 'hitler', 'holocaust',
+    'racist', 'racism', 'racial slur',
+    'hate speech', 'discriminat',
+  ]
+
+  // 检查所有关键词
+  const allKeywords = [...sexualKeywords, ...violentKeywords, ...hateKeywords]
+  
+  for (const keyword of allKeywords) {
+    // 使用单词边界匹配，避免误判（如 "pen" 不匹配 "penis"）
+    const regex = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\w*\\b`, 'i')
+    if (regex.test(lowerText)) {
+      return true
+    }
+  }
+
+  // 检查特定模式（如用户示例中的描述）
+  const inappropriatePatterns = [
+    /\b(?:gigantic|huge|ultra-thick|very veiny|super heavy)\s+(?:penis|dick|cock|balls|testicles)\b/i,
+    /\b(?:penis|dick|cock)\s+(?:is|has|have)\s+(?:gigantic|huge|big|large|thick|veiny)\b/i,
+    /\b(?:balls|testicles)\s+(?:is|are|has|have)\s+(?:huge|big|large|heavy|super heavy)\b/i,
+  ]
+
+  for (const pattern of inappropriatePatterns) {
+    if (pattern.test(text)) {
+      return true
+    }
+  }
+
+  return false
+}
+
 // 解析headcanon文本,提取core_idea, development, moment
 function parseHeadcanon(text: string) {
   let cleanText = text.trim()
@@ -139,6 +211,27 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { headcanonType, focusArea, characterInput, length } = body
 
+    // 检查用户输入是否包含不适当内容
+    if (containsInappropriateContent(characterInput)) {
+      console.log(`[${timestamp}] 🚫 检测到不适当内容 - 拒绝请求`)
+      console.log(`   用户输入包含不当内容，已拒绝生成`)
+      return NextResponse.json(
+        { error: "Your input contains inappropriate, explicit, or illegal content. Please provide appropriate character descriptions for headcanon generation." },
+        { status: 400 }
+      )
+    }
+
+    // 检查其他输入字段
+    const allInputText = `${headcanonType || ''} ${focusArea || ''} ${characterInput || ''}`.trim()
+    if (containsInappropriateContent(allInputText)) {
+      console.log(`[${timestamp}] 🚫 检测到不适当内容 - 拒绝请求`)
+      console.log(`   输入包含不当内容，已拒绝生成`)
+      return NextResponse.json(
+        { error: "Your input contains inappropriate, explicit, or illegal content. Please provide appropriate content for headcanon generation." },
+        { status: 400 }
+      )
+    }
+
     console.log("\n" + "=".repeat(80))
     console.log(`[${timestamp}] 🚀 收到新的 Headcanon 生成请求`)
     console.log("=".repeat(80))
@@ -194,6 +287,8 @@ The relationship headcanon should:
 - Be safe-for-work and appropriate
 - Avoid referencing real people
 - Include specific details that make the relationship feel authentic and believable
+- STRICTLY PROHIBITED: No sexual content, explicit descriptions, adult themes, violence, illegal activities, or inappropriate material of any kind
+- DO NOT include any explicit, sexual, violent, or illegal content whatsoever
 
 Format your response EXACTLY as follows (use \\n\\n to separate sections):
 Core Idea: [your core idea here]
@@ -226,6 +321,8 @@ The headcanon should:
 - Be safe-for-work and appropriate
 - Avoid referencing real people
 - Include specific details that make it feel authentic and believable
+- STRICTLY PROHIBITED: No sexual content, explicit descriptions, adult themes, violence, illegal activities, or inappropriate material of any kind
+- DO NOT include any explicit, sexual, violent, or illegal content whatsoever
 
 Format your response EXACTLY as follows (use \\n\\n to separate sections):
 Core Idea: [your core idea here]
@@ -318,6 +415,16 @@ Generate the headcanon now:`
       console.error("❌ 响应中没有生成内容!")
       console.error("   完整响应:", JSON.stringify(data, null, 2))
       throw new Error("No content generated")
+    }
+
+    // 检查AI生成的内容是否包含不适当内容
+    if (containsInappropriateContent(headcanon)) {
+      console.log(`[${timestamp}] 🚫 检测到AI生成内容包含不适当内容 - 拒绝返回`)
+      console.log(`   AI生成的内容包含不当内容，已拒绝返回`)
+      return NextResponse.json(
+        { error: "The generated content contains inappropriate, explicit, or illegal content. Please try again with different inputs." },
+        { status: 400 }
+      )
     }
 
     const totalDuration = Date.now() - startTime
