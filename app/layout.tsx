@@ -21,11 +21,11 @@ const _geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  // 1. Title 页面标签 - 40-60字符，关键词在开头，末尾加域名
-  title: "Free Headcanon Generator - AI Tool | headcanonforge.com",
-  // 2. Description 页面描述 - 140-160字符，包含关键词和行动号召
+  // 1. Title 页面标签 - 50-60字符，关键词在开头，末尾加域名
+  title: "Headcanon Generator - AI-Powered Tool | headcanonforge.com",
+  // 2. Description 页面描述 - 150-160字符，包含关键词和行动号召
   description:
-    "Generate creative headcanon ideas for any character with our free AI-powered headcanon generator. Perfect for writers, fanfiction creators, and RPG players. Start creating today!",
+    "Generate creative headcanon ideas for any character with our AI-powered headcanon generator. Perfect for writers, fanfiction creators, RPG players, and world-builders. Start creating unique character backstories today!",
   // 7. robots 元标签
   robots: {
     index: true,

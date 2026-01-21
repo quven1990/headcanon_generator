@@ -9,7 +9,9 @@ import { createClient } from '@supabase/supabase-js'
  * 
  * 添加新页面的方法：
  * 1. 静态页面：在 staticPages 数组中添加新条目
- * 2. 博客文章：自动从 headcanon-generator-blogs/ 目录读取，无需手动添加
+ * 2. 博客文章：自动从 blog-posts/ 目录读取，无需手动添加
+ *    - 所有 blog-posts/ 目录下的 .md 文件会自动出现在 sitemap 中
+ *    - headcanon-generator-blogs/ 目录用于存放抓取的文章，不会出现在 sitemap 中
  * 3. 动态页面：在相应的位置添加生成逻辑
  */
 
@@ -70,12 +72,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 这些博客会自动出现在 sitemap 中，无需手动修改此文件
   // headcanon-generator-blogs/ 目录用于存放抓取的文章，不会出现在 sitemap 中
   const blogPosts = getAllBlogPosts()
-  const blogPagesSitemap: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${siteUrl}/blog/${post.slug}`,
-    lastModified: post.date ? new Date(post.date) : now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }))
+  const blogPagesSitemap: MetadataRoute.Sitemap = blogPosts.map((post) => {
+    // 根据文章日期设置优先级：新文章（30天内）优先级更高
+    const postDate = post.date ? new Date(post.date) : null
+    const daysSincePost = postDate ? (now.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24) : Infinity
+    const priority = daysSincePost <= 30 ? 0.8 : 0.7 // 新文章优先级0.8，旧文章0.7
+    
+    return {
+      url: `${siteUrl}/blog/${post.slug}`,
+      lastModified: postDate || now,
+      changeFrequency: 'monthly' as const,
+      priority,
+    }
+  })
   
   // 自动获取所有 explore 记录并生成 sitemap 条目
   // 注意：当有新的 headcanon 生成记录时，会自动出现在 sitemap 中
