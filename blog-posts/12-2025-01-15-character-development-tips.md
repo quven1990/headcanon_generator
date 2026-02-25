@@ -32,7 +32,7 @@ Perfect characters are boring. Real people are full of contradictions, and your 
 
 ## 3. Develop a Detailed Backstory
 
-Even if you never mention it directly in your story, knowing your character's complete history helps you write consistently. Use our [AI Headcanon Generator](/blog/free-ai-character-headcanon-generator-online) to explore different backstory possibilities.
+Even if you never mention it directly in your story, knowing your character's complete history helps you write consistently. Use our [AI Headcanon Generator](/character-headcanon) to explore different backstory possibilities.
 
 **Key backstory elements:**
 - Childhood experiences that shaped them
@@ -120,7 +120,7 @@ If you answer "no" to any of these, continue developing your character.
 
 ## Using AI Tools for Character Development
 
-Modern writers have powerful tools at their disposal. Our [Free AI Character Headcanon Generator](/blog/free-ai-character-headcanon-generator-online) can help you:
+Modern writers have powerful tools at their disposal. Our [Free AI Character Headcanon Generator](/character-headcanon) can help you:
 
 - Generate backstory ideas when you're stuck
 - Explore different personality traits
