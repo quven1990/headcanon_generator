@@ -142,7 +142,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-6 text-sm text-gray-600">
               <a 
-                href="https://headcanonforge.com/" 
+                href={`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com"}/`} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-gray-900 transition-colors"

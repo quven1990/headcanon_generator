@@ -23,7 +23,7 @@ Headcanon Forge is an innovative AI-powered headcanon generator tool designed fo
 
 ### Website
 
-🌐 **Live Site**: [https://headcanonforge.com/](https://headcanonforge.com/)
+🌐 **Live Site**: [https://www.headcanonforge.com/](https://www.headcanonforge.com/)
 
 ### Tech Stack
 
