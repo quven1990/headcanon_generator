@@ -165,8 +165,42 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <MarkdownRenderer content={post.content} />
         </div>
 
+        {/* Related Tools CTA */}
+        <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Try Our Generators</h3>
+          <p className="text-gray-600 text-sm mb-4">
+            Put these tips into practice with our free AI tools.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/character-headcanon"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Character Headcanon
+            </Link>
+            <Link
+              href="/relationship-headcanon"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-colors"
+            >
+              Relationship Headcanon
+            </Link>
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Explore Generations
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Home
+            </Link>
+          </div>
+        </div>
+
         {/* Footer Navigation */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
+        <div className="mt-8 pt-8 border-t border-gray-200">
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"

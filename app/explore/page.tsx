@@ -167,9 +167,35 @@ function ExploreContent() {
           <div className="text-center py-12">
             <Compass className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg mb-2">No generations yet</p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm mb-6">
               Start creating headcanons to see them here!
             </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/character-headcanon"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Character Headcanon
+              </Link>
+              <Link
+                href="/relationship-headcanon"
+                className="inline-flex items-center px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-colors"
+              >
+                Relationship Headcanon
+              </Link>
+              <Link
+                href="/blog"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Blog & Guides
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Home
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -343,6 +369,39 @@ function ExploreContent() {
             {/* Pagination Info */}
             <div className="text-center mt-4 text-sm text-gray-500">
               Showing {((currentPage - 1) * 12) + 1} to {Math.min(currentPage * 12, pagination.total)} of {pagination.total} generations
+            </div>
+          </div>
+        )}
+
+        {/* Create More CTA - only when we have records */}
+        {records.length > 0 && (
+          <div className="mt-12 p-6 bg-white rounded-xl border border-gray-200 text-center">
+            <p className="text-gray-600 text-sm mb-4">Create your own headcanons and see them here</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/character-headcanon"
+                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+              >
+                Character Headcanon
+              </Link>
+              <Link
+                href="/relationship-headcanon"
+                className="text-pink-600 hover:text-pink-800 font-medium text-sm"
+              >
+                Relationship Headcanon
+              </Link>
+              <Link
+                href="/blog"
+                className="text-gray-600 hover:text-gray-900 font-medium text-sm"
+              >
+                Blog & Guides
+              </Link>
+              <Link
+                href="/"
+                className="text-gray-600 hover:text-gray-900 font-medium text-sm"
+              >
+                Home
+              </Link>
             </div>
           </div>
         )}

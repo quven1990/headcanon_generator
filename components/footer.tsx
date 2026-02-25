@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Sparkles, Heart, Home, BookOpen } from "lucide-react"
+import { Sparkles, Heart, Home, BookOpen, Compass } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const footerNavigation = [
@@ -20,6 +20,11 @@ const footerNavigation = [
     name: "Relationship Headcanon",
     href: "/relationship-headcanon",
     icon: Heart,
+  },
+  {
+    name: "Explore",
+    href: "/explore",
+    icon: Compass,
   },
   {
     name: "Blog",
@@ -128,6 +133,14 @@ export function Footer() {
                   className="hover:text-gray-900 transition-colors"
                 >
                   Relationship Headcanon Generator
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/explore" 
+                  className="hover:text-gray-900 transition-colors"
+                >
+                  Explore Generations
                 </Link>
               </li>
             </ul>

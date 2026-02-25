@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Sparkles, Target, Rocket, Lightbulb, RefreshCw, LogIn, Lock, Copy, Check } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
@@ -999,7 +1000,7 @@ export default function CharacterHeadcanonPage() {
               Writers and creators benefit significantly from using a character headcanon generator. The tool helps overcome writer's block by providing fresh perspectives on familiar characters. When you're stuck on character development or need inspiration for new story directions, the headcanon generator can spark creative ideas that lead to more engaging narratives.
             </p>
             <p className="text-lg leading-relaxed mb-4">
-              For fanfiction writers specifically, the character headcanon generator enables exploration of alternative character interpretations while maintaining consistency with established canon. The generator helps develop character voices, motivations, and internal conflicts that enrich storytelling. Role-playing game enthusiasts can use the headcanon generator to quickly develop NPC backgrounds and character motivations that enhance their game sessions.
+              For fanfiction writers specifically, the character headcanon generator enables exploration of alternative character interpretations while maintaining consistency with established canon. The generator helps develop character voices, motivations, and internal conflicts that enrich storytelling. Try our <Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800">Relationship Headcanon Generator</Link> for character dynamics, or <Link href="/blog" className="text-blue-600 hover:text-blue-800">browse our blog</Link> for more writing tips. Role-playing game enthusiasts can use the headcanon generator to quickly develop NPC backgrounds and character motivations that enhance their game sessions.
             </p>
           </section>
 
@@ -1009,8 +1010,28 @@ export default function CharacterHeadcanonPage() {
               To get the most out of our character headcanon generator, it's important to provide clear and specific input. While the generator works with minimal information, including character names and fandom details helps produce more accurate and relevant headcanons. When using the generator, consider what aspects of the character you want to explore and select appropriate types and tones.
             </p>
             <p className="text-lg leading-relaxed mb-4">
-              The generated headcanons from our character headcanon generator should be viewed as starting points for your creative work. Use them as inspiration to develop your own unique interpretations, combining multiple generated ideas, or refining the output to better fit your creative vision. Remember that the best headcanons feel authentic and enhance rather than contradict the original character's essence.
+              The generated headcanons from our character headcanon generator should be viewed as starting points for your creative work. Use them as inspiration to develop your own unique interpretations, combining multiple generated ideas, or refining the output to better fit your creative vision. Remember that the best headcanons feel authentic and enhance rather than contradict the original character&apos;s essence.
             </p>
+          </section>
+
+          {/* Related Links */}
+          <section className="mt-12 p-6 bg-gray-50 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Explore More</h3>
+            <p className="text-gray-600 text-sm mb-4">Try our other tools and resources</p>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                Relationship Headcanon
+              </Link>
+              <Link href="/explore" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                Explore Generations
+              </Link>
+              <Link href="/blog" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                Blog & Guides
+              </Link>
+              <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                Home
+              </Link>
+            </div>
           </section>
         </article>
       </div>

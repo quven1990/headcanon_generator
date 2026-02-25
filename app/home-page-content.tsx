@@ -316,17 +316,17 @@ export function HomePageContent() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-gray-900">What is a Headcanon Generator?</h2>
             <p className="text-base leading-relaxed mb-4">
-              A headcanon generator is an innovative AI-powered tool designed to help writers, fanfiction creators, and role-playing game enthusiasts develop unique character interpretations and backstories. This headcanon generator uses advanced artificial intelligence to create personalized character headcanons that explore personality traits, hidden talents, relationship dynamics, and untold stories that never made it into the original canon.
+              A headcanon generator is an innovative AI-powered tool designed to help writers, fanfiction creators, and role-playing game enthusiasts develop unique character interpretations and backstories. Our <Link href="/character-headcanon" className="text-blue-600 hover:text-blue-800 font-medium">Character Headcanon Generator</Link> and <Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800 font-medium">Relationship Headcanon Generator</Link> use advanced artificial intelligence to create personalized headcanons that explore personality traits, hidden talents, relationship dynamics, and untold stories that never made it into the original canon.
             </p>
             <p className="text-base leading-relaxed mb-4">
-              Whether you're crafting fanfiction, developing original characters for your novel, or building rich narratives for tabletop RPGs, our headcanon generator provides endless creative inspiration. The tool allows you to customize every aspect of your character's story, from their deepest motivations to their most mundane daily habits.
+              Whether you&apos;re crafting fanfiction, developing original characters for your novel, or building rich narratives for tabletop RPGs, our headcanon generator provides endless creative inspiration. <Link href="/explore" className="text-blue-600 hover:text-blue-800 font-medium">Browse community generations</Link> for ideas, or read our <Link href="/blog" className="text-blue-600 hover:text-blue-800 font-medium">blog guides</Link> for tips. The tool allows you to customize every aspect of your character&apos;s story, from their deepest motivations to their most mundane daily habits.
             </p>
           </section>
 
           <section>
             <h2 className="text-3xl font-bold mb-4 text-gray-900">How to Use Our Headcanon Generator</h2>
             <p className="text-base leading-relaxed mb-4">
-              Using our headcanon generator is simple and intuitive. Start by selecting the type of headcanon you want to create - whether it's a character headcanon focusing on individual traits and backstories, or a relationship headcanon exploring the dynamics between multiple characters. Enter your character names, specify the fandom or universe they belong to, and choose from various customization options including tone, length, and additional context.
+              Using our headcanon generator is simple and intuitive. Start by selecting the type of headcanon you want to create - whether it&apos;s a <Link href="/character-headcanon" className="text-blue-600 hover:text-blue-800">character headcanon</Link> focusing on individual traits and backstories, or a <Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800">relationship headcanon</Link> exploring the dynamics between multiple characters. Enter your character names, specify the fandom or universe they belong to, and choose from various customization options including tone, length, and additional context.
             </p>
             <p className="text-base leading-relaxed mb-4">
               Our AI headcanon generator will then craft a unique, detailed headcanon that includes a core idea, development of the concept, and a vivid moment that illustrates the headcanon in action. The generated content is structured to provide both inspiration and a solid foundation for your creative writing projects.
@@ -346,7 +346,7 @@ export function HomePageContent() {
           <section>
             <h2 className="text-3xl font-bold mb-4 text-gray-900">Types of Headcanons You Can Generate</h2>
             <p className="text-base leading-relaxed mb-4">
-              Our headcanon generator supports multiple types of headcanon creation. Character headcanons focus on individual character development, exploring personality traits, backstories, hidden talents, and personal quirks. Relationship headcanons examine the bonds between characters, whether they're friendships, romantic relationships, rivalries, or mentor-student dynamics.
+              Our headcanon generator supports multiple types of headcanon creation. <Link href="/character-headcanon" className="text-blue-600 hover:text-blue-800">Character headcanons</Link> focus on individual character development, exploring personality traits, backstories, hidden talents, and personal quirks. <Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800">Relationship headcanons</Link> examine the bonds between characters, whether they&apos;re friendships, romantic relationships, rivalries, or mentor-student dynamics.
             </p>
             <p className="text-base leading-relaxed mb-4">
               The generator can create headcanons in various tones - from wholesome and emotional to dark and humorous. You can specify the length of the generated content, from short and concise summaries to long, detailed explorations. This flexibility makes our headcanon generator suitable for a wide range of creative projects and writing styles.

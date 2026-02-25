@@ -129,10 +129,10 @@ export default function BlogPage() {
               Master Character Headcanon Creation with Expert Guides
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to the Headcanon Generator Blog, your ultimate resource for creating compelling character backstories, developing rich personality traits, and exploring relationship dynamics. Whether you're a fanfiction writer, role-playing game enthusiast, or creative writer, our comprehensive guides will help you master the art of character development.
+              Welcome to the Headcanon Generator Blog, your ultimate resource for creating compelling character backstories, developing rich personality traits, and exploring relationship dynamics. Try our <Link href="/character-headcanon" className="text-blue-600 hover:text-blue-800 font-medium">Character Headcanon Generator</Link> or <Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800 font-medium">Relationship Headcanon Generator</Link> to get started. Whether you&apos;re a fanfiction writer, role-playing game enthusiast, or creative writer, our comprehensive guides will help you master the art of character development.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Our blog features in-depth articles covering everything from basic character development techniques to advanced AI-powered headcanon generation strategies. Learn how to use our free AI headcanon generator effectively, discover creative headcanon ideas for anime characters, and explore relationship dynamics that bring your stories to life.
+              Our blog features in-depth articles covering everything from basic character development techniques to advanced AI-powered headcanon generation strategies. Learn how to use our free AI headcanon generator effectively, discover creative headcanon ideas for anime characters, and explore relationship dynamics that bring your stories to life. Browse <Link href="/explore" className="text-blue-600 hover:text-blue-800 font-medium">community generations</Link> for inspiration.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
               Each article is carefully crafted to provide actionable insights, practical examples, and step-by-step guidance. From understanding the psychology behind character motivations to creating authentic dialogue and building emotional connections, our content covers all aspects of character headcanon creation.
@@ -142,14 +142,14 @@ export default function BlogPage() {
             </h3>
             <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
               <li>Essential character development techniques and best practices</li>
-              <li>How to use AI headcanon generators effectively for inspiration</li>
+              <li>How to use our <Link href="/character-headcanon" className="text-blue-600 hover:text-blue-800">AI character headcanon generator</Link> effectively for inspiration</li>
               <li>Creative headcanon ideas for anime, fanfiction, and original characters</li>
-              <li>Relationship headcanon development strategies</li>
+              <li><Link href="/relationship-headcanon" className="text-blue-600 hover:text-blue-800">Relationship headcanon</Link> development strategies</li>
               <li>Tips for writing compelling character backstories</li>
               <li>Advanced techniques for character psychology and motivation</li>
             </ul>
             <p className="text-gray-700 leading-relaxed">
-              Browse our articles above to find the perfect guide for your creative journey. Each post is designed to help you create more engaging, authentic, and memorable characters that resonate with your audience.
+              Browse our articles above to find the perfect guide for your creative journey. Each post is designed to help you create more engaging, authentic, and memorable characters that resonate with your audience. Ready to create? Start with our <Link href="/character-headcanon" className="text-blue-600 hover:text-blue-800 font-medium">Character Headcanon Generator</Link> or explore the <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">homepage</Link> for all tools.
             </p>
           </section>
         </div>
