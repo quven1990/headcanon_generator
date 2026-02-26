@@ -7,13 +7,16 @@ export const metadata: Metadata = {
   title: "Headcanon Generation Details | headcanonforge.com",
   description:
     "View detailed headcanon generation including core ideas, character development, and memorable moments. Explore your AI-generated creative content with full details and context.",
-  // 7. robots 元标签 - 用户特定页面，不索引
+  // 7. robots 元标签 - 公开详情页，允许索引
   robots: {
-    index: false, // Detail page is user-specific, should not be indexed
+    index: true,
     follow: true,
     googleBot: {
-      index: false,
+      index: true,
       follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   // 8. canonical 标签 - 用户特定页面，使用基础路径
