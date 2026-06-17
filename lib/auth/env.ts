@@ -2,7 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare"
 import type { CloudflareAuthEnv } from "./types"
 
 export async function getAuthEnv(): Promise<CloudflareAuthEnv> {
-  const { env } = await getCloudflareContext()
+  const { env } = await getCloudflareContext({ async: true })
   const authEnv = env as unknown as CloudflareAuthEnv
 
   if (!authEnv.DB) {
