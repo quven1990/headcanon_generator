@@ -29,10 +29,10 @@
     {
       "binding": "DB",
       "database_name": "headcanon-auth",
-      "database_id": "REPLACE_AFTER_WRANGLER_D1_CREATE"
+      "database_id": "6a366fd9-eb3a-4eae-97f5-129af6419e7c",
+      "migrations_dir": "migrations"
     }
   ],
-  "migrations_dir": "migrations",
   "vars": {
     "OAUTH_REDIRECT_URI": "https://www.headcanonforge.com/api/auth/callback/google",
     "NEXT_PUBLIC_SITE_URL": "https://www.headcanonforge.com"
