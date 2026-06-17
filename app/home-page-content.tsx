@@ -364,6 +364,45 @@ export function HomePageContent() {
           </section>
         </article>
 
+        <section className="mt-16 rounded-xl border border-gray-200 bg-white/80 p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">More Creative Guides</h2>
+          <ul className="space-y-2 text-sm text-gray-600">
+            <li>
+              <a
+                href="https://buildaring.online/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Build A Ring Farm Wiki
+              </a>
+              <span className="text-gray-500"> — Roblox farming codes, seeds & calculator</span>
+            </li>
+            <li>
+              <a
+                href="https://aieditorrspediting.xyz/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                AI Editor RSP Editing
+              </a>
+              <span className="text-gray-500"> — RSP-style AI photo prompts & guides</span>
+            </li>
+            <li>
+              <a
+                href="https://pickaxe-tycoon.xyz/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Pickaxe Tycoon Guide
+              </a>
+              <span className="text-gray-500"> — Merge calculator, tier list & codes</span>
+            </li>
+          </ul>
+        </section>
+
         {/* Footer */}
         <footer className="mt-20 text-center text-sm text-gray-400">
           <p>Powered by AI · For creative inspiration only</p>
