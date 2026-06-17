@@ -2,7 +2,16 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host')?.split(':')[0]
   const pathname = request.nextUrl.pathname
+
+  // 裸域 headcanonforge.com → www.headcanonforge.com（Cloudflare 上 next.config redirects 不兼容 :path*）
+  if (hostname === 'headcanonforge.com') {
+    const url = request.nextUrl.clone()
+    url.hostname = 'www.headcanonforge.com'
+    url.protocol = 'https:'
+    return NextResponse.redirect(url, 301)
+  }
 
   // 完全跳过公共页面和静态资源 - 不执行任何操作，直接返回
   // 这些页面对 SEO 很重要，不应该有任何延迟
