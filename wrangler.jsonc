@@ -4,6 +4,9 @@
   "name": "headcanon-generator",
   "compatibility_date": "2026-06-16",
   "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
   "build": {
     "command": "pnpm run build:cloudflare"
   },
