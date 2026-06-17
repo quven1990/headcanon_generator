@@ -11,9 +11,6 @@
       "invocation_logs": true
     }
   },
-  "build": {
-    "command": "pnpm run build:cloudflare"
-  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

@@ -32,6 +32,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify Cloudflare secrets
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "::error::Missing CLOUDFLARE_API_TOKEN. Add it in GitHub → Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "::error::Missing CLOUDFLARE_ACCOUNT_ID. Add it in GitHub → Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+
       - name: Deploy to Cloudflare
         run: pnpm run deploy:cloudflare
         env:
