@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { LogIn, LogOut, User } from "lucide-react"
 import { useEffect, useState, useRef } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 
@@ -17,6 +17,11 @@ export function GoogleLoginButton() {
   const hasInitialized = useRef(false) // 跟踪是否已经初始化
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setLoading(false)
+      return
+    }
+
     // 检查 URL 中的错误参数（使用 window.location 而不是 useSearchParams）
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
@@ -37,6 +42,10 @@ export function GoogleLoginButton() {
     const checkUser = async () => {
       try {
         const supabase = createClient()
+        if (!supabase) {
+          setLoading(false)
+          return
+        }
         // 先尝试获取 session，如果 session 存在，再获取 user
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
@@ -81,6 +90,7 @@ export function GoogleLoginButton() {
         const refreshUser = async () => {
           try {
             const supabase = createClient()
+            if (!supabase) return
             const { data: { session } } = await supabase.auth.getSession()
             if (session?.user) {
               setUser(session.user)
@@ -105,6 +115,10 @@ export function GoogleLoginButton() {
 
     // 监听认证状态变化
     const supabase = createClient()
+    if (!supabase) {
+      return
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         setUser(session?.user ?? null)
@@ -133,6 +147,8 @@ export function GoogleLoginButton() {
     setIsLoggingOut(true)
     try {
       const supabase = createClient()
+      if (!supabase) return
+
       const { error } = await supabase.auth.signOut()
       
       if (error) throw error

@@ -1,16 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client"
 
 export function useAuth() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setLoading(false)
+      return
+    }
+
     const checkUser = async () => {
       try {
         const supabase = createClient()
+        if (!supabase) {
+          setLoading(false)
+          return
+        }
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
         if (sessionError) {
@@ -41,8 +50,11 @@ export function useAuth() {
 
     checkUser()
 
-    // 监听认证状态变化
     const supabase = createClient()
+    if (!supabase) {
+      return
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         setUser(session?.user ?? null)
