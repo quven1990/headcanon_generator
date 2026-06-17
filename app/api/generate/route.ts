@@ -1,6 +1,6 @@
-import { createServerClient } from "@supabase/ssr"
-import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
+import { getAuthEnv } from "@/lib/auth/env"
+import { getCurrentUser } from "@/lib/auth/session"
 
 // 内容过滤函数：检测不适当、违法或不当内容
 function containsInappropriateContent(text: string): boolean {
@@ -124,25 +124,6 @@ function parseHeadcanon(text: string) {
   }
 }
 
-// 将UUID字符串转换为bigint (使用hash算法)
-function uuidToBigInt(uuid: string): number {
-  try {
-    // 移除UUID中的连字符
-    const cleanUuid = uuid.replace(/-/g, '')
-    // 使用简单的hash算法: 将UUID的前部分转换为数字
-    let hash = 0
-    for (let i = 0; i < Math.min(15, cleanUuid.length); i++) {
-      const char = cleanUuid.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // 转换为32位整数
-    }
-    // 确保结果是正数
-    return Math.abs(hash) % Number.MAX_SAFE_INTEGER
-  } catch (error) {
-    console.warn("UUID转换失败,使用默认值0:", error)
-    return 0
-  }
-}
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now()
@@ -152,53 +133,11 @@ export async function POST(req: NextRequest) {
   })
 
   try {
-    // 在 API 路由中，需要使用 NextRequest 来创建 Supabase 客户端
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+    const env = await getAuthEnv()
+    const user = await getCurrentUser(req, env)
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.log(`[${timestamp}] ❌ Supabase 环境变量未配置`)
-      return NextResponse.json(
-        { error: "Server configuration error. Please contact support." },
-        { status: 500 }
-      )
-    }
-
-    let supabaseResponse = NextResponse.next({
-      request: {
-        headers: req.headers,
-      },
-    })
-
-    const supabase = createServerClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          getAll() {
-            return req.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => req.cookies.set(name, value))
-            supabaseResponse = NextResponse.next({
-              request: {
-                headers: req.headers,
-              },
-            })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
-    // 检查用户是否已登录（服务器端验证）
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    if (!user) {
       console.log(`[${timestamp}] ❌ 未授权访问 - 用户未登录`)
-      console.log(`   错误信息: ${authError?.message || 'No user found'}`)
       return NextResponse.json(
         { error: "Authentication required. Please sign in to generate headcanons." },
         { status: 401 }
@@ -510,68 +449,37 @@ Generate the headcanon now:`
       }
     }
 
-    // 转换user_id: UUID字符串转bigint
-    let userId = 0
-    try {
-      userId = uuidToBigInt(user.id)
-    } catch (error) {
-      console.warn("⚠️  无法转换user_id,使用默认值0:", error)
-      userId = 0
-    }
+    const userId = user.id
 
-    // 保存到数据库 - 使用 service_role key 绕过 RLS 策略
     let recordId: number | null = null
     try {
-      console.log("💾 正在保存数据到数据库...")
-      
-      // 使用 service_role key 创建管理员客户端（绕过 RLS）
-      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
-      
-      if (!serviceRoleKey) {
-        console.warn("⚠️  SUPABASE_SERVICE_ROLE_KEY 未配置,跳过数据库保存")
-        console.warn("   如需保存数据,请在 .env.local 中添加 SUPABASE_SERVICE_ROLE_KEY")
-        console.warn("   获取方式: Supabase Dashboard -> Project Settings -> API -> service_role key")
+      console.log("💾 正在保存数据到 D1...")
+
+      const result = await env.DB.prepare(
+        `INSERT INTO headcanon_generations
+         (user_id, type, input_data, core_idea, development, moment, is_favorite, is_deleted, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, 0, 0, datetime('now'))`
+      )
+        .bind(
+          userId,
+          generationType,
+          JSON.stringify(inputData),
+          coreIdea,
+          development,
+          moment
+        )
+        .run()
+
+      if (!result.success) {
+        console.error("❌ D1 保存失败")
       } else {
-        // 使用 @supabase/supabase-js 创建管理员客户端（绕过 RLS）
-        const adminSupabase = createClient(supabaseUrl, serviceRoleKey, {
-          auth: {
-            autoRefreshToken: false,
-            persistSession: false
-          }
-        })
-
-        const { data: insertedData, error: dbError } = await adminSupabase
-          .from("headcanon_generations")
-          .insert({
-            user_id: userId,
-            type: generationType,
-            input_data: inputData,
-            core_idea: coreIdea,
-            development: development,
-            moment: moment,
-            is_favorite: 0,
-            is_deleted: 0,
-          })
-          .select("id")
-          .single()
-
-        if (dbError) {
-          console.error("❌ 数据库保存失败:")
-          console.error(`   错误信息: ${dbError.message}`)
-          console.error(`   错误详情: ${JSON.stringify(dbError)}`)
-          // 不中断流程,继续返回生成的内容
-        } else {
-          console.log("✅ 数据已成功保存到数据库")
-          if (insertedData?.id) {
-            recordId = insertedData.id
-            console.log(`   记录 ID: ${recordId}`)
-          }
-        }
+        const idRow = await env.DB.prepare("SELECT last_insert_rowid() as id").first<{ id: number }>()
+        recordId = idRow?.id ?? null
+        console.log("✅ 数据已成功保存到 D1")
+        if (recordId) console.log(`   记录 ID: ${recordId}`)
       }
     } catch (saveError) {
-      console.error("❌ 保存数据时发生异常:")
-      console.error(`   错误信息: ${saveError instanceof Error ? saveError.message : String(saveError)}`)
-      // 不中断流程,继续返回生成的内容
+      console.error("❌ 保存数据时发生异常:", saveError)
     }
 
     console.log("=".repeat(80))

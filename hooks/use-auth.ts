@@ -1,73 +1,46 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client"
+import { useCallback, useEffect, useState } from "react"
+
+export interface AuthUser {
+  id: string
+  email: string
+  user_metadata?: {
+    full_name?: string | null
+    name?: string | null
+    avatar_url?: string | null
+    picture?: string | null
+  }
+}
 
 export function useAuth() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setLoading(false)
-      return
-    }
-
-    const checkUser = async () => {
-      try {
-        const supabase = createClient()
-        if (!supabase) {
-          setLoading(false)
-          return
-        }
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
-        if (sessionError) {
-          if (sessionError.message?.includes('session') || sessionError.message?.includes('Session')) {
-            setUser(null)
-            setLoading(false)
-            return
-          }
-          throw sessionError
-        }
-        
-        if (session?.user) {
-          setUser(session.user)
-        } else {
-          setUser(null)
-        }
-      } catch (error: any) {
-        if (error?.message?.includes('session') || error?.message?.includes('Session')) {
-          setUser(null)
-        } else {
-          console.error('Error checking user:', error)
-          setUser(null)
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkUser()
-
-    const supabase = createClient()
-    if (!supabase) {
-      return
-    }
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        setUser(session?.user ?? null)
-      } else if (event === 'SIGNED_OUT') {
+  const refresh = useCallback(async () => {
+    try {
+      const response = await fetch("/api/auth/me", { credentials: "include" })
+      if (!response.ok) {
         setUser(null)
+        return
       }
-    })
-
-    return () => {
-      subscription.unsubscribe()
+      const data = await response.json()
+      setUser(data.user ?? null)
+    } catch {
+      setUser(null)
+    } finally {
+      setLoading(false)
     }
   }, [])
 
-  return { user, loading, isAuthenticated: !!user }
-}
+  useEffect(() => {
+    refresh()
+  }, [refresh])
 
+  const signOut = useCallback(async () => {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+    setUser(null)
+  }, [])
+
+  return { user, loading, signOut, refresh, isAuthenticated: Boolean(user) }
+}

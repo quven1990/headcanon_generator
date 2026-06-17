@@ -1,0 +1,5 @@
+# Copy to .dev.vars and fill in values (never commit .dev.vars)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+OAUTH_REDIRECT_URI=http://localhost:8787/api/auth/callback/google
+NEXT_PUBLIC_SITE_URL=http://localhost:8787

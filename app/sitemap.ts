@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getAllBlogPosts } from '@/lib/blog'
-import { createClient } from '@supabase/supabase-js'
+import { getAuthEnv } from '@/lib/auth/env'
 
 /**
  * Sitemap 配置
@@ -91,35 +91,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 使用 service_role key 绕过 RLS 策略，获取所有未删除的记录
   let explorePagesSitemap: MetadataRoute.Sitemap = []
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
-    
-    if (supabaseUrl && serviceRoleKey) {
-      const adminSupabase = createClient(supabaseUrl, serviceRoleKey, {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      })
-      
-      // 获取所有未删除的记录，按创建时间倒序排列
-      const { data: records, error } = await adminSupabase
-        .from("headcanon_generations")
-        .select("id, created_at")
-        .eq("is_deleted", 0)
-        .order("created_at", { ascending: false })
-      
-      if (!error && records && records.length > 0) {
-        explorePagesSitemap = records.map((record) => ({
-          url: `${siteUrl}/explore/${record.id}`,
-          lastModified: record.created_at ? new Date(record.created_at) : now,
-          changeFrequency: 'weekly' as const,
-          priority: 0.6,
-        }))
-      }
+    const env = await getAuthEnv()
+    const { results } = await env.DB.prepare(
+      `SELECT id, created_at FROM headcanon_generations
+       WHERE is_deleted = 0
+       ORDER BY datetime(created_at) DESC`
+    ).all<{ id: number; created_at: string }>()
+
+    if (results?.length) {
+      explorePagesSitemap = results.map((record) => ({
+        url: `${siteUrl}/explore/${record.id}`,
+        lastModified: record.created_at ? new Date(record.created_at) : now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+      }))
     }
   } catch (error) {
-    // 如果获取 explore 记录失败，不影响其他页面的 sitemap 生成
     console.error('Error fetching explore records for sitemap:', error)
   }
   

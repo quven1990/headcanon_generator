@@ -18,7 +18,7 @@ import {
 interface GenerationRecord {
   id: number
   created_at: string
-  user_id: number
+  user_id: string | number
   type: string
   input_data: {
     characterName?: string
