@@ -1,11 +1,15 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
   "name": "headcanon-generator",
+  "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-16",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
   },
   "build": {
     "command": "pnpm run build:cloudflare"
@@ -13,5 +17,15 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "www.headcanonforge.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "headcanonforge.com",
+      "custom_domain": true
+    }
+  ]
 }
