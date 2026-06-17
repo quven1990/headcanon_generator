@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "build:cloudflare": "opennextjs-cloudflare build",
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy:cloudflare": "opennextjs-cloudflare deploy",
     "cursor-mcp-add": "node scripts/cursor-mcp-add.js"
   },
   "dependencies": {
