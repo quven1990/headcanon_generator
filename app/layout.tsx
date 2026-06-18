@@ -90,6 +90,16 @@ export default function RootLayout({
             gtag('config', 'G-XE3TDNW61V');
           `}
         </Script>
+        <Script
+          src="https://plausible.shipsolo.io/js/pa-riwWpD-k_a5FGy2mUDmEW.js"
+          strategy="afterInteractive"
+        />
+        <Script id="plausible-analytics" strategy="afterInteractive">
+          {`
+            window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+            plausible.init()
+          `}
+        </Script>
         <Navbar />
         {children}
         <Footer />
