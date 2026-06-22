@@ -29,6 +29,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
+import { ShareToExploreOption } from "@/components/share-to-explore-option"
 import { getGenerateErrorMessage } from "@/lib/api/generate-errors"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 
@@ -100,6 +101,7 @@ export default function CharacterHeadcanonPage() {
   const [countdown, setCountdown] = useState<number | null>(null)
   const [totalTime, setTotalTime] = useState<number>(0)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const [shareToExplore, setShareToExplore] = useState(true)
   const [pendingGenerate, setPendingGenerate] = useState(false)
   const [autoGenerateFlag, setAutoGenerateFlag] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -318,6 +320,7 @@ export default function CharacterHeadcanonPage() {
           focusArea: tone === "Random Selection" ? "" : tone,
           characterInput: `${characterName}${fandom ? ` from ${fandom}` : ""}${context ? `. ${context}` : ""}`,
           length: length,
+          shareToExplore,
         }),
       })
 
@@ -395,7 +398,7 @@ export default function CharacterHeadcanonPage() {
 
 
   return (
-    <div className="min-h-screen">
+    <div id="main-content" className="min-h-screen">
       <div className="mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-24 md:pb-16">
         <SEOBreadcrumb />
         {/* Hero Section */}
@@ -583,6 +586,12 @@ export default function CharacterHeadcanonPage() {
                     className="min-h-24 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl resize-none bg-white transition-all"
                   />
                 </div>
+
+                <ShareToExploreOption
+                  checked={shareToExplore}
+                  onCheckedChange={setShareToExplore}
+                  id="character-share-to-explore"
+                />
 
                 {/* Generate Button */}
                 <TooltipProvider>

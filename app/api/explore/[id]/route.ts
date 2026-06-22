@@ -24,10 +24,10 @@ export async function GET(
     const env = await getDbEnv()
 
     const row = await env.DB.prepare(
-      `SELECT id, user_id, type, input_data, core_idea, development, moment,
-              is_favorite, is_deleted, created_at
+      `SELECT id, type, input_data, core_idea, development, moment,
+              is_favorite, is_deleted, is_public, created_at
        FROM headcanon_generations
-       WHERE id = ? AND is_deleted = 0`
+       WHERE id = ? AND is_deleted = 0 AND is_public = 1`
     )
       .bind(recordId)
       .first<Record<string, unknown>>()
@@ -36,17 +36,24 @@ export async function GET(
       return NextResponse.json({ error: "Generation not found" }, { status: 404 })
     }
 
-    return NextResponse.json({
-      data: {
-        ...row,
-        input_data:
-          typeof row.input_data === "string" ? parseInputData(row.input_data) : row.input_data,
+    return NextResponse.json(
+      {
+        data: {
+          ...row,
+          input_data:
+            typeof row.input_data === "string" ? parseInputData(row.input_data) : row.input_data,
+        },
       },
-    })
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600",
+        },
+      }
+    )
   } catch (error) {
     console.error("Explore detail API error:", error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
+      { error: "Internal server error" },
       { status: 500 }
     )
   }

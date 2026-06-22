@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { formatDistanceToNow } from "date-fns"
-import { Compass, User } from "lucide-react"
+import { Compass, Clock } from "lucide-react"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 import Link from "next/link"
 import {
@@ -18,7 +18,6 @@ import {
 interface GenerationRecord {
   id: number
   created_at: string
-  user_id: string | number
   type: string
   input_data: {
     characterName?: string
@@ -121,7 +120,7 @@ function ExploreContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div id="main-content" className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -134,7 +133,7 @@ function ExploreContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div id="main-content" className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
           <SEOBreadcrumb />
           <div className="text-center py-12">
@@ -146,7 +145,7 @@ function ExploreContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div id="main-content" className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
         <SEOBreadcrumb />
         
@@ -154,11 +153,11 @@ function ExploreContent() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-4">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Explore Generations
+              Community Explore
             </span>
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Browse through AI-generated headcanons from the community
+            Browse headcanons that creators chose to share publicly. Sign in to generate your own and opt in or out of sharing.
           </p>
         </div>
 
@@ -166,9 +165,9 @@ function ExploreContent() {
         {records.length === 0 ? (
           <div className="text-center py-12">
             <Compass className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg mb-2">No generations yet</p>
+            <p className="text-gray-500 text-lg mb-2">No public generations yet</p>
             <p className="text-gray-400 text-sm">
-              Start creating headcanons to see them here!
+              Generate a headcanon and check &quot;Share to community Explore&quot; to appear here.
             </p>
           </div>
         ) : (
@@ -216,7 +215,7 @@ function ExploreContent() {
                     {/* Metadata */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <User className="w-4 h-4" />
+                        <Clock className="w-4 h-4" />
                         <span>{relativeTime}</span>
                       </div>
                       <Link

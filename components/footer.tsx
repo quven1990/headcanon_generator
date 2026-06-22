@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Sparkles, Heart, Home, BookOpen } from "lucide-react"
+import { Sparkles, Heart, Home, BookOpen, Compass } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const footerNavigation = [
@@ -26,6 +26,11 @@ const footerNavigation = [
     href: "/blog",
     icon: BookOpen,
   },
+  {
+    name: "Explore",
+    href: "/explore",
+    icon: Compass,
+  },
 ]
 
 export function Footer() {
@@ -47,7 +52,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-gray-600">
-              Free AI-powered headcanon generator for writers, fanfiction creators, and RPG enthusiasts.
+              Free AI headcanon generator. Sign in with Google to create; browse community creations in Explore.
             </p>
           </div>
 
@@ -84,17 +89,12 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-gray-600">
               <li>
                 <span className="hover:text-gray-900 cursor-default">
-                  Free to use
+                  Google sign-in to generate
                 </span>
               </li>
               <li>
                 <span className="hover:text-gray-900 cursor-default">
-                  Google Sign-in
-                </span>
-              </li>
-              <li>
-                <span className="hover:text-gray-900 cursor-default">
-                  AI-powered generation
+                  Optional public Explore sharing
                 </span>
               </li>
               <li>
@@ -140,10 +140,16 @@ export function Footer() {
             <p className="text-sm text-gray-600">
               © {currentYear} Headcanon Forge. Powered by AI · For creative inspiration only.
             </p>
-            <div className="flex items-center gap-6 text-sm text-gray-600">
-              <a 
-                href={`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com"}/`} 
-                target="_blank" 
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-gray-600">
+              <Link href="/privacy" className="hover:text-gray-900 transition-colors">
+                Privacy
+              </Link>
+              <Link href="/terms" className="hover:text-gray-900 transition-colors">
+                Terms
+              </Link>
+              <a
+                href={`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com"}/`}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-900 transition-colors"
               >

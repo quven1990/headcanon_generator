@@ -92,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const env = await getDbEnv()
     const { results } = await env.DB.prepare(
       `SELECT id, created_at FROM headcanon_generations
-       WHERE is_deleted = 0
+       WHERE is_deleted = 0 AND is_public = 1
        ORDER BY datetime(created_at) DESC`
     ).all<{ id: number; created_at: string }>()
 

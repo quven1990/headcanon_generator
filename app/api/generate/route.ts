@@ -146,10 +146,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.log(`[${timestamp}] ✅ 用户已登录: ${user.email}`)
+    console.log(`[${timestamp}] ✅ User authenticated: ${user.id}`)
 
     const body = await req.json()
-    const { headcanonType, focusArea, characterInput, length } = body
+    const { headcanonType, focusArea, characterInput, length, shareToExplore = true } = body
 
     if (!characterInput || typeof characterInput !== "string" || !characterInput.trim()) {
       return NextResponse.json(
@@ -467,6 +467,8 @@ Generate the headcanon now:`
 
     const userId = user.id
 
+    const isPublic = shareToExplore === false ? 0 : 1
+
     let recordId: number | null = null
     let saveWarning: string | null = null
     try {
@@ -474,8 +476,8 @@ Generate the headcanon now:`
 
       const result = await env.DB.prepare(
         `INSERT INTO headcanon_generations
-         (user_id, type, input_data, core_idea, development, moment, is_favorite, is_deleted, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, 0, 0, datetime('now'))`
+         (user_id, type, input_data, core_idea, development, moment, is_favorite, is_deleted, is_public, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, datetime('now'))`
       )
         .bind(
           userId,
@@ -483,7 +485,8 @@ Generate the headcanon now:`
           JSON.stringify(inputData),
           coreIdea,
           development,
-          moment
+          moment,
+          isPublic
         )
         .run()
 

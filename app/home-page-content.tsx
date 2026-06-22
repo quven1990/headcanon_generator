@@ -51,7 +51,7 @@ const generatorTypes = [
 // 客户端组件 - 包含所有静态内容和 SEO 内容（使用客户端组件以支持登录检查）
 export function HomePageContent() {
   return (
-    <div className="min-h-screen">
+    <div id="main-content" className="min-h-screen">
       <div className="mx-auto max-w-7xl px-6 py-8 md:py-12">
         {/* Hero Section */}
         <header className="mb-12 text-center">

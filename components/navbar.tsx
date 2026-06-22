@@ -29,7 +29,7 @@ const navigation = [
     name: "Explore",
     href: "/explore",
     icon: Compass,
-    description: "Explore your generations",
+    description: "Browse community-shared AI headcanons",
   },
   {
     name: "Blog",

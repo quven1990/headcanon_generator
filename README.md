@@ -13,7 +13,7 @@ Headcanon Forge is an AI-powered headcanon generator for writers, fanfiction cre
 - **Database:** Cloudflare D1
 - **Auth:** Google OAuth (custom session + D1)
 - **AI:** SiliconFlow API
-- **Analytics:** Google Analytics + Plausible
+- **Analytics:** Plausible
 
 ## Local Development
 
@@ -49,7 +49,8 @@ pnpm run deploy:cloudflare
 ## Features
 
 - Character & relationship headcanon generation (Google sign-in required)
-- Community Explore gallery (public shared generations)
+- Optional public sharing to Community Explore (opt-in per generation)
+- Privacy policy and terms of service at `/privacy` and `/terms`
 - Blog section with writing guides
 
 ---
