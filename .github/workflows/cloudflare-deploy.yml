@@ -55,3 +55,18 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Smoke test production
+        run: |
+          SITE_URL="${{ secrets.NEXT_PUBLIC_SITE_URL }}"
+          if [ -z "$SITE_URL" ]; then
+            SITE_URL="https://www.headcanonforge.com"
+          fi
+          for path in "/" "/api/auth/me" "/api/explore?page=1&limit=1"; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" "${SITE_URL}${path}")
+            echo "${path} -> ${code}"
+            if [ "$code" != "200" ]; then
+              echo "::error::Smoke test failed for ${path} (${code})"
+              exit 1
+            fi
+          done

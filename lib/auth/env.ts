@@ -1,16 +1,27 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare"
-import type { CloudflareAuthEnv } from "./types"
+import type { CloudflareAuthEnv, CloudflareDbEnv } from "./types"
 
-export async function getAuthEnv(): Promise<CloudflareAuthEnv> {
+async function getBindings(): Promise<CloudflareDbEnv> {
   const { env } = await getCloudflareContext({ async: true })
-  const authEnv = env as unknown as CloudflareAuthEnv
+  return env as unknown as CloudflareDbEnv
+}
 
-  if (!authEnv.DB) {
+export async function getDbEnv(): Promise<CloudflareDbEnv> {
+  const bindings = await getBindings()
+
+  if (!bindings.DB) {
     throw new Error("D1 binding DB is not configured. Add d1_databases to wrangler.jsonc.")
   }
-  if (!authEnv.GOOGLE_CLIENT_ID || !authEnv.GOOGLE_CLIENT_SECRET) {
+
+  return bindings
+}
+
+export async function getAuthEnv(): Promise<CloudflareAuthEnv> {
+  const bindings = await getDbEnv()
+
+  if (!bindings.GOOGLE_CLIENT_ID || !bindings.GOOGLE_CLIENT_SECRET) {
     throw new Error("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set.")
   }
 
-  return authEnv
+  return bindings as CloudflareAuthEnv
 }

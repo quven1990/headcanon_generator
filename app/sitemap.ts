@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getAllBlogPosts } from '@/lib/blog'
-import { getAuthEnv } from '@/lib/auth/env'
+import { getDbEnv } from '@/lib/auth/env'
 
 /**
  * Sitemap 配置
@@ -86,12 +86,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
   
-  // 自动获取所有 explore 记录并生成 sitemap 条目
-  // 注意：当有新的 headcanon 生成记录时，会自动出现在 sitemap 中
-  // 使用 service_role key 绕过 RLS 策略，获取所有未删除的记录
+  // 社区公开画廊：从 D1 读取已发布的生成记录
   let explorePagesSitemap: MetadataRoute.Sitemap = []
   try {
-    const env = await getAuthEnv()
+    const env = await getDbEnv()
     const { results } = await env.DB.prepare(
       `SELECT id, created_at FROM headcanon_generations
        WHERE is_deleted = 0

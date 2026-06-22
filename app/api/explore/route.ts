@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuthEnv } from "@/lib/auth/env"
+import { getDbEnv } from "@/lib/auth/env"
 
 function parseInputData(raw: string) {
   try {
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "12", 10)
     const offset = (page - 1) * limit
 
-    const env = await getAuthEnv()
+    const env = await getDbEnv()
 
     const countRow = await env.DB.prepare(
       "SELECT COUNT(*) as total FROM headcanon_generations WHERE is_deleted = 0"

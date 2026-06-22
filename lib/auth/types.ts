@@ -13,10 +13,17 @@ export interface GoogleUserInfo {
   picture?: string
 }
 
-export interface CloudflareAuthEnv {
+export interface CloudflareDbEnv {
   DB: D1Database
-  GOOGLE_CLIENT_ID: string
-  GOOGLE_CLIENT_SECRET: string
   OAUTH_REDIRECT_URI?: string
   NEXT_PUBLIC_SITE_URL?: string
+  GOOGLE_CLIENT_ID?: string
+  GOOGLE_CLIENT_SECRET?: string
+  SILICONFLOW_API_KEY?: string
+  SILICONFLOW_MODEL?: string
+}
+
+export interface CloudflareAuthEnv extends CloudflareDbEnv {
+  GOOGLE_CLIENT_ID: string
+  GOOGLE_CLIENT_SECRET: string
 }

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuthEnv } from "@/lib/auth/env"
+import { getDbEnv } from "@/lib/auth/env"
 import { getCurrentUser } from "@/lib/auth/session"
 
 export async function GET(request: NextRequest) {
   try {
-    const env = await getAuthEnv()
+    const env = await getDbEnv()
     const user = await getCurrentUser(request, env)
 
     if (!user) {

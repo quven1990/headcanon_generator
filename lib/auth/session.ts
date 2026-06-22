@@ -1,7 +1,13 @@
-import type { AuthUser, CloudflareAuthEnv } from "./types"
+import type { AuthUser, CloudflareDbEnv } from "./types"
 import { getSessionIdFromRequest } from "./cookies"
 
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000
+
+export async function purgeExpiredSessions(db: D1Database): Promise<void> {
+  await db
+    .prepare("DELETE FROM sessions WHERE datetime(expires_at) <= datetime('now')")
+    .run()
+}
 
 export async function upsertGoogleUser(
   db: D1Database,
@@ -39,6 +45,8 @@ export async function createSession(
   userId: string,
   meta?: { userAgent?: string | null; ipAddress?: string | null }
 ): Promise<string> {
+  await purgeExpiredSessions(db)
+
   const sessionId = crypto.randomUUID()
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS).toISOString()
 
@@ -59,7 +67,7 @@ export async function deleteSession(db: D1Database, sessionId: string): Promise<
 
 export async function getCurrentUser(
   request: Request,
-  env: CloudflareAuthEnv
+  env: CloudflareDbEnv
 ): Promise<AuthUser | null> {
   const sessionId = getSessionIdFromRequest(request)
   if (!sessionId) return null

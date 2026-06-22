@@ -3,3 +3,5 @@ GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 OAUTH_REDIRECT_URI=http://localhost:8787/api/auth/callback/google
 NEXT_PUBLIC_SITE_URL=http://localhost:8787
+SILICONFLOW_API_KEY=your-siliconflow-api-key
+SILICONFLOW_MODEL=deepseek-ai/DeepSeek-R1-0528-Qwen3-8B

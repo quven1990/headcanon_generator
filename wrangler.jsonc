@@ -35,6 +35,7 @@
   ],
   "vars": {
     "OAUTH_REDIRECT_URI": "https://www.headcanonforge.com/api/auth/callback/google",
-    "NEXT_PUBLIC_SITE_URL": "https://www.headcanonforge.com"
+    "NEXT_PUBLIC_SITE_URL": "https://www.headcanonforge.com",
+    "SILICONFLOW_MODEL": "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"
   }
 }

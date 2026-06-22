@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuthEnv } from "@/lib/auth/env"
+import { getDbEnv } from "@/lib/auth/env"
 
 function parseInputData(raw: string) {
   try {
@@ -21,7 +21,7 @@ export async function GET(
       return NextResponse.json({ error: "Invalid record ID" }, { status: 400 })
     }
 
-    const env = await getAuthEnv()
+    const env = await getDbEnv()
 
     const row = await env.DB.prepare(
       `SELECT id, user_id, type, input_data, core_idea, development, moment,

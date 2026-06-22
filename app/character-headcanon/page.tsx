@@ -29,7 +29,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
-import { Toaster } from "@/components/ui/toaster"
+import { getGenerateErrorMessage } from "@/lib/api/generate-errors"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 
 const headcanonTypes = [
@@ -312,6 +312,7 @@ export default function CharacterHeadcanonPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           headcanonType: headcanonType === "Random Selection" ? "" : headcanonType,
           focusArea: tone === "Random Selection" ? "" : tone,
@@ -324,10 +325,18 @@ export default function CharacterHeadcanonPage() {
       if (timeoutId) clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error("Failed to generate headcanon")
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(getGenerateErrorMessage(response.status, payload.error))
       }
 
       const data = await response.json()
+
+      if (data.saveWarning) {
+        toast({
+          title: "Saved with warning",
+          description: data.saveWarning,
+        })
+      }
 
       // 清除所有定时器
       if (timeoutId) clearTimeout(timeoutId)
@@ -373,7 +382,7 @@ export default function CharacterHeadcanonPage() {
       if (timeoutId) clearTimeout(timeoutId)
       toast({
         title: "Generation Failed",
-        description: "Something went wrong. Please try again.",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
         variant: "destructive",
       })
       setIsLoadingSection(null)
@@ -1014,7 +1023,6 @@ export default function CharacterHeadcanonPage() {
           </section>
         </article>
       </div>
-      <Toaster />
     </div>
   )
 }

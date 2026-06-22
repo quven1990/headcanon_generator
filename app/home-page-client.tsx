@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Sparkles, Heart, ArrowRight, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
@@ -88,7 +87,7 @@ export default function HomePageClient() {
               Generate creative backstories, personality traits, and relationship dynamics for any character from any fandom. Perfect for fanfiction, role-playing games, and creative writing.
             </p>
             <p className="text-sm md:text-base text-gray-600 mb-8">
-              <span className="font-semibold text-green-600">Free to Use</span> • No sign-up required to explore • Instant results
+              <span className="font-semibold text-green-600">Free to browse</span> • Sign in with Google to generate • Instant results
             </p>
             
             {/* 主要CTA按钮 - 醒目且响应式 */}
@@ -117,7 +116,7 @@ export default function HomePageClient() {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-600 mb-4">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
               <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span className="font-medium text-green-700">Free to Use</span>
+              <span className="font-medium text-green-700">Google Sign-in to Generate</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
@@ -313,7 +312,6 @@ export default function HomePageClient() {
           <p>Powered by AI · For creative inspiration only</p>
         </footer>
       </div>
-      <Toaster />
     </div>
   )
 }

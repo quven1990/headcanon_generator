@@ -11,6 +11,7 @@ import {
   resolveOAuthRedirectUri,
 } from "@/lib/auth/google-oauth"
 import { createSession, upsertGoogleUser } from "@/lib/auth/session"
+import { sanitizeNextPath } from "@/lib/auth/redirect"
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   const { state: savedState, codeVerifier } = getOAuthStateFromRequest(request)
   const [state, encodedNext = encodeURIComponent("/")] = stateParam.split(":", 2)
-  const nextPath = decodeURIComponent(encodedNext || "/")
+  const nextPath = sanitizeNextPath(decodeURIComponent(encodedNext || "/"))
 
   if (!savedState || !codeVerifier || savedState !== state) {
     return NextResponse.redirect(

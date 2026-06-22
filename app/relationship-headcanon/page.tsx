@@ -29,7 +29,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
-import { Toaster } from "@/components/ui/toaster"
+import { getGenerateErrorMessage } from "@/lib/api/generate-errors"
 import { SEOBreadcrumb } from "@/components/seo-breadcrumb"
 
 const relationshipTypes = [
@@ -319,6 +319,7 @@ export default function RelationshipHeadcanonPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           headcanonType: finalRelationshipType || "Relationship",
           focusArea: tone === "Random Selection" ? "" : tone,
@@ -330,10 +331,18 @@ export default function RelationshipHeadcanonPage() {
       if (timeoutId) clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error("Failed to generate headcanon")
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(getGenerateErrorMessage(response.status, payload.error))
       }
 
       const data = await response.json()
+
+      if (data.saveWarning) {
+        toast({
+          title: "Saved with warning",
+          description: data.saveWarning,
+        })
+      }
       const parsed = parseHeadcanon(data.headcanon)
 
       setIsLoadingSection("coreIdea")
@@ -372,7 +381,7 @@ export default function RelationshipHeadcanonPage() {
       if (timeoutId) clearTimeout(timeoutId)
       toast({
         title: "Generation Failed",
-        description: "Something went wrong. Please try again.",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
         variant: "destructive",
       })
       setIsLoadingSection(null)
@@ -1068,7 +1077,6 @@ export default function RelationshipHeadcanonPage() {
           </section>
         </article>
       </div>
-      <Toaster />
     </div>
   )
 }

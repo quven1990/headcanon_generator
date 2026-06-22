@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuthEnv } from "@/lib/auth/env"
+import { checkGenerationRateLimit } from "@/lib/auth/rate-limit"
 import { getCurrentUser } from "@/lib/auth/session"
+import { getEnvVar } from "@/lib/runtime/env"
 
 // 内容过滤函数：检测不适当、违法或不当内容
 function containsInappropriateContent(text: string): boolean {
@@ -51,8 +53,8 @@ function containsInappropriateContent(text: string): boolean {
   const allKeywords = [...sexualKeywords, ...violentKeywords, ...hateKeywords]
   
   for (const keyword of allKeywords) {
-    // 使用单词边界匹配，避免误判（如 "pen" 不匹配 "penis"）
-    const regex = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\w*\\b`, 'i')
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i')
     if (regex.test(lowerText)) {
       return true
     }
@@ -146,9 +148,23 @@ export async function POST(req: NextRequest) {
 
     console.log(`[${timestamp}] ✅ 用户已登录: ${user.email}`)
 
-    // 读取请求体（需要在验证之后）
     const body = await req.json()
     const { headcanonType, focusArea, characterInput, length } = body
+
+    if (!characterInput || typeof characterInput !== "string" || !characterInput.trim()) {
+      return NextResponse.json(
+        { error: "Character description is required." },
+        { status: 400 }
+      )
+    }
+
+    const rateLimit = await checkGenerationRateLimit(env.DB, user.id)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Hourly generation limit reached. Please try again later." },
+        { status: 429 }
+      )
+    }
 
     // 检查用户输入是否包含不适当内容
     if (containsInappropriateContent(characterInput)) {
@@ -272,31 +288,31 @@ Moment: [your moment here]
 
 Generate the headcanon now:`
 
-    // 从环境变量获取 API Key 和模型，必须配置
-    const apiKey = process.env.SILICONFLOW_API_KEY
-    const model = process.env.SILICONFLOW_MODEL
+    // 从 Cloudflare Worker 环境变量 / Secrets 读取 AI 配置
+    const apiKey = await getEnvVar("SILICONFLOW_API_KEY")
+    const model = await getEnvVar("SILICONFLOW_MODEL")
 
     if (!apiKey) {
       console.error("❌ 错误: SILICONFLOW_API_KEY 未配置!")
-      console.error("   请在 .env.local 文件中配置 SILICONFLOW_API_KEY")
+      console.error("   请在 Cloudflare Worker Secrets 或 .dev.vars 中配置 SILICONFLOW_API_KEY")
       return Response.json(
-        { error: "SILICONFLOW_API_KEY is not configured. Please set it in .env.local" },
+        { error: "SILICONFLOW_API_KEY is not configured. Please set it in Cloudflare Worker secrets." },
         { status: 500 }
       )
     }
 
     if (!model) {
       console.error("❌ 错误: SILICONFLOW_MODEL 未配置!")
-      console.error("   请在 .env.local 文件中配置 SILICONFLOW_MODEL")
+      console.error("   请在 wrangler.jsonc vars 或 .dev.vars 中配置 SILICONFLOW_MODEL")
       return Response.json(
-        { error: "SILICONFLOW_MODEL is not configured. Please set it in .env.local" },
+        { error: "SILICONFLOW_MODEL is not configured. Please set it in Cloudflare Worker variables." },
         { status: 500 }
       )
     }
 
     console.log("🤖 AI 配置:")
     console.log(`   - 模型: ${model}`)
-    console.log(`   - API Key: ${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 4)}`)
+    console.log(`   - API Key: configured`)
     console.log("")
     console.log("📤 正在发送请求到 SiliconFlow API...")
 
@@ -452,6 +468,7 @@ Generate the headcanon now:`
     const userId = user.id
 
     let recordId: number | null = null
+    let saveWarning: string | null = null
     try {
       console.log("💾 正在保存数据到 D1...")
 
@@ -472,6 +489,7 @@ Generate the headcanon now:`
 
       if (!result.success) {
         console.error("❌ D1 保存失败")
+        saveWarning = "Generated successfully but failed to save to your history."
       } else {
         const idRow = await env.DB.prepare("SELECT last_insert_rowid() as id").first<{ id: number }>()
         recordId = idRow?.id ?? null
@@ -480,12 +498,13 @@ Generate the headcanon now:`
       }
     } catch (saveError) {
       console.error("❌ 保存数据时发生异常:", saveError)
+      saveWarning = "Generated successfully but failed to save to your history."
     }
 
     console.log("=".repeat(80))
     console.log(`[${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false })}] ✅ 请求处理完成\n`)
 
-    return Response.json({ headcanon, recordId })
+    return Response.json({ headcanon, recordId, saveWarning })
   } catch (error) {
     const totalDuration = Date.now() - startTime
     console.error("")
@@ -501,9 +520,9 @@ Generate the headcanon now:`
     console.error(`[${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false })}] ❌ 请求处理失败\n`)
     
     return Response.json(
-      { 
-        error: error instanceof Error ? error.message : "Failed to generate headcanon" 
-      }, 
+      {
+        error: "Failed to generate headcanon. Please try again.",
+      },
       { status: 500 }
     )
   }

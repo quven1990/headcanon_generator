@@ -22,6 +22,9 @@ yarn-error.log*
 .env*
 .dev.vars
 
+# macOS
+.DS_Store
+
 # vercel
 .vercel
 

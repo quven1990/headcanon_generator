@@ -3,12 +3,13 @@ import { buildOAuthCookies } from "@/lib/auth/cookies"
 import { getAuthEnv } from "@/lib/auth/env"
 import { buildGoogleAuthUrl, resolveOAuthRedirectUri } from "@/lib/auth/google-oauth"
 import { createPkcePair, generateRandomString } from "@/lib/auth/pkce"
+import { sanitizeNextPath } from "@/lib/auth/redirect"
 
 export async function GET(request: NextRequest) {
   try {
     const env = await getAuthEnv()
     const requestUrl = new URL(request.url)
-    const next = requestUrl.searchParams.get("next") || "/"
+    const next = sanitizeNextPath(requestUrl.searchParams.get("next"))
 
     const state = generateRandomString(32)
     const { codeVerifier, codeChallenge } = await createPkcePair()

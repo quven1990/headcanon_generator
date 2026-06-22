@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { clearSessionCookie, getSessionIdFromRequest } from "@/lib/auth/cookies"
-import { getAuthEnv } from "@/lib/auth/env"
+import { getDbEnv } from "@/lib/auth/env"
 import { deleteSession } from "@/lib/auth/session"
 
 export async function POST(request: NextRequest) {
   try {
-    const env = await getAuthEnv()
+    const env = await getDbEnv()
     const sessionId = getSessionIdFromRequest(request)
 
     if (sessionId) {

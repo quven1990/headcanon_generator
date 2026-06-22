@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation"
 import { Sparkles, Heart, Home, BookOpen, Compass } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { GoogleLoginButtonLazy } from "@/components/google-login-button-lazy"
-import { Toaster } from "@/components/ui/toaster"
 
 const navigation = [
   {
