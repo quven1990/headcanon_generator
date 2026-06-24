@@ -62,7 +62,7 @@ jobs:
           if [ -z "$SITE_URL" ]; then
             SITE_URL="https://www.headcanonforge.com"
           fi
-          for path in "/" "/privacy" "/terms" "/api/auth/me" "/api/explore?page=1&limit=1"; do
+          for path in "/" "/privacy" "/terms" "/blog" "/blog/how-to-use-headcanon-generator" "/api/auth/me" "/api/explore?page=1&limit=1"; do
             code=$(curl -sS -o /dev/null -w "%{http_code}" "${SITE_URL}${path}")
             echo "${path} -> ${code}"
             if [ "$code" != "200" ]; then
