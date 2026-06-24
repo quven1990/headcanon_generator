@@ -6,6 +6,7 @@ import { MarkdownRenderer } from "@/components/markdown-renderer"
 import { Calendar, User, ArrowLeft, ExternalLink } from "lucide-react"
 import { format } from "date-fns"
 import { BlogBreadcrumb } from "@/components/blog-breadcrumb"
+import { BlogPostingSchema } from "@/components/blog-posting-schema"
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -111,8 +112,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     postDate = !isNaN(date.getTime()) ? date : null
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.headcanonforge.com"
+  const postUrl = `${siteUrl}/blog/${slug}`
+  let schemaDescription = post.excerpt || post.content
+  schemaDescription = schemaDescription
+    .replace(/^#+\s+/gm, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .trim()
+    .replace(/\s+/g, " ")
+  if (schemaDescription.length > 160) {
+    schemaDescription = schemaDescription.substring(0, 157) + "..."
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <BlogPostingSchema
+        title={post.title}
+        description={schemaDescription}
+        url={postUrl}
+        datePublished={post.date}
+        author={post.author}
+      />
       <article className="mx-auto max-w-4xl px-6 py-12 sm:py-16 lg:py-20">
         <BlogBreadcrumb postTitle={post.title} />
         {/* Back Button */}
